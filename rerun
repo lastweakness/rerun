@@ -1,0 +1,178 @@
+#!/usr/bin/env python
+#
+# Could use just '#!/usr/bin/env python' if you're NOT on Ubuntu or any other
+# distribution that has python2 as the main python version.
+#
+# Rerun is a GTK+3 application launcher, command runner, root runner and
+# graphics switcher (run application with PRIME turned on). BUT thats all
+# it does. No added features, not many bug fixes or anything else.
+# No bloat whatsoever, no feature creep.
+# Licensing and other notes at end.
+from __future__ import absolute_import, division
+from __future__ import print_function, unicode_literals
+try:
+    import sys
+    import os  # basics
+    import gi
+    gi.require_version('Gtk', '3.0')  # inform the PC that we need GTK+ 3.
+    from gi.repository import Gtk  # this is the GNOME depends
+except ImportError as imper:
+    print("Importing GObject failed!")
+    print("Install GObject bindings.")
+    print(imper)
+    sys.exit(0)
+PATH = os.path.dirname(os.path.realpath(__file__))
+GLADEFILE = PATH + "/rerun.ui"
+builder = Gtk.Builder()
+builder.add_from_file(GLADEFILE)
+window = builder.get_object('rerun')  # main window
+command = builder.get_object('command')  # main window
+run = builder.get_object('run')  # main window
+rootrun = builder.get_object('rootrun')
+rootpass = builder.get_object('rootpass')
+pron = builder.get_object('pron')
+proff = builder.get_object('proff')
+prdefault = builder.get_object('prdefault')
+prime = builder.get_object('prime')
+window.show_all()
+try:
+    import subprocess  # for processes.
+    import threading
+except ImportError as imper:
+    print("Imports Failed!!! Can't Run!!!")
+    print(imper)
+    sys.exit(0)
+# This is needed for ignoring unwanted terminal output.
+NULLMAKER = open(os.devnull, 'w')
+pstate = "1"
+
+
+class thready(threading.Thread):
+    def __init__(self, cmd, sin=None, root=False, rpass=None):
+        threading.Thread.__init__(self)
+        self.cmd = cmd
+        self.root = root
+        self.rpass = rpass
+        self.sin = sin
+
+    def run(self):
+        p = subprocess.Popen(self.cmd, shell=True,
+                             stdin=self.sin,
+                             stdout=NULLMAKER,
+                             stderr=subprocess.STDOUT,
+                             universal_newlines=True)
+        if self.root:
+            p.stdin.write(self.rpass + '\n')
+            p.stdin.close()
+
+
+class rerunmain():
+    def on_window_destroy(self, rerun):
+        print("Quitting.")
+        Gtk.main_quit()
+
+    def regrun(self):
+        if prdefault.get_active():
+            thread = thready(command.get_text())
+            thread.start()
+            thread.join()
+        elif pron.get_active():
+            thread = thready("env DRI_PRIME=1 " + command.get_text())
+            thread.start()
+            thread.join()
+        elif proff.get_active():
+            thread = thready("env DRI_PRIME=0 " + command.get_text())
+            thread.start()
+            thread.join()
+
+    def sudorun(self):
+        if prdefault.get_active():
+            thread = thready('sudo -S "' + command.get_text().strip() +
+                             '"', subprocess.PIPE, True, rootpass.get_text())
+            thread.start()
+            thread.join()
+        elif pron.get_active():
+            thread = thready("env DRI_PRIME=1 " + 'sudo -S "' +
+                             command.get_text().strip() +
+                             '"', subprocess.PIPE, True, rootpass.get_text())
+            thread.start()
+            thread.join()
+        elif proff.get_active():
+            thread = thready("env DRI_PRIME=0 " + 'sudo -S "' +
+                             command.get_text().strip() +
+                             '"', subprocess.PIPE, True, rootpass.get_text())
+            thread.start()
+            thread.join()
+
+    def on_run_clicked(self, run):
+        try:
+            if not command.get_text().strip() == '':
+                if not rootrun.get_active():
+                    self.regrun()
+                else:
+                    self.sudorun()
+        except Exception:
+            print('Action failed!')
+
+    def on_run_entr(self, command):
+        self.on_run_clicked(run)
+
+    def xfixpress(self, xfixbutton):
+        try:
+            subprocess.Popen("xhost si:localuser:root", shell=True)
+        except Exception:
+            print("Action failed!")
+
+
+builder.connect_signals(rerunmain())
+Gtk.main()
+
+# Additional Notes and such:
+# 1. shell=True..... Yes. Yes. Its normally unsafe and not recomended but
+#    in this case, its perfectly safe as no stdin is ever accepted and
+#    is not saved. Please correct me if I'm wrong.
+#
+# 2. NULLMAKER is a variable to /dev/null, this is where output is mostly
+#    redirected to.
+#
+# 3. sudo vs gksudo and similar alternatives: As of now, gksudo, kdesudo,
+#    etc have been deprecated. But sudo still remains a feasible option.
+#    pkexec would have been a better option but it does not work with
+#    GUI applications.
+#
+# 4. The code is structured based on suggestions from PEP8 and McCabe
+#    Complexity Check. So, this is as simple as it can get.
+#
+# 5. DEPRECATED, NON-MULTITHREADED CODE FOR REFERENCE:
+#    ___________________________________________________________________
+#    subprocess.Popen('sudo -S "' + command.get_text().strip() +
+#                     '"', stdout=NULLMAKER, stdin=subprocess.PIPE,
+#                     stderr=subprocess.STDOUT, universal_newlines=True,
+#                     shell=True).communicate(rootpass.get_text() +
+#                                             '\n')
+#    ___________________________________________________________________
+#
+# 6. Why mulithreading? Because then, it won't freeze the app. To confirm,
+#    use above deprecated code to root-run Nautilus.
+#
+# 7. STDIN in root-run: This pipe is closed immediately after password input
+#    and thus, should be safe.
+#
+# LICENSING:
+#
+# rerun
+# Copyright (C) 2017 Mufeed Ali
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+#
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
