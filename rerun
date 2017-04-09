@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 #
-# Could use just '#!/usr/bin/env python' if you're NOT on Ubuntu or any other
-# distribution that has python2 as the main python version.
-#
 # Rerun is a GTK+3 application launcher, command runner, root runner and
 # graphics switcher (run application with PRIME turned on). BUT thats all
 # it does. No added features, not many bug fixes or anything else.
 # No bloat whatsoever, no feature creep.
 # Licensing and other notes at end.
-from __future__ import absolute_import, division
-from __future__ import print_function, unicode_literals
+from __future__ import print_function
+import sys
+import os  # basics
+import subprocess  # for processes.
+import threading
 try:
-    import sys
-    import os  # basics
     import gi
     gi.require_version('Gtk', '3.0')  # inform the PC that we need GTK+ 3.
     from gi.repository import Gtk  # this is the GNOME depends
@@ -21,30 +19,25 @@ except ImportError as imper:
     print("Install GObject bindings.")
     print(imper)
     sys.exit(0)
-PATH = os.path.dirname(os.path.realpath(__file__))
-GLADEFILE = PATH + "/rerun.ui"
-builder = Gtk.Builder()
-builder.add_from_file(GLADEFILE)
-window = builder.get_object('rerun')  # main window
-window.show_all()
+
+
+def gload():
+    global builder
+    PATH = os.path.dirname(os.path.realpath(__file__))
+    GLADEFILE = PATH + "/rerun.ui"
+    builder = Gtk.Builder()
+    builder.add_from_file(GLADEFILE)
+    window = builder.get_object('rerun')  # main window
+    window.show_all()
+
+
+gload()
+NULLMAKER = open(os.devnull, 'w')
 command = builder.get_object('command')
-run = builder.get_object('run')
-rootrun = builder.get_object('rootrun')
-rootpass = builder.get_object('rootpass')
 pron = builder.get_object('pron')
 proff = builder.get_object('proff')
 prdefault = builder.get_object('prdefault')
-prime = builder.get_object('prime')
-try:
-    import subprocess  # for processes.
-    import threading
-except ImportError as imper:
-    print("Imports Failed!!! Can't Run!!!")
-    print(imper)
-    sys.exit(0)
 # This is needed for ignoring unwanted terminal output.
-NULLMAKER = open(os.devnull, 'w')
-pstate = "1"
 
 
 class thready(threading.Thread):
@@ -68,7 +61,6 @@ class thready(threading.Thread):
 
 class rerunmain():
     def on_window_destroy(self, rerun):
-        print("Quitting.")
         Gtk.main_quit()
 
     def regrun(self):
@@ -86,6 +78,7 @@ class rerunmain():
             thread.join()
 
     def sudorun(self):
+        rootpass = builder.get_object('rootpass')
         if prdefault.get_active():
             thread = thready('sudo -S "' + command.get_text().strip() +
                              '"', subprocess.PIPE, True, rootpass.get_text())
@@ -105,23 +98,27 @@ class rerunmain():
             thread.join()
 
     def on_run_clicked(self, run):
+        rootrun = builder.get_object('rootrun')
         try:
             if not command.get_text().strip() == '':
                 if not rootrun.get_active():
                     self.regrun()
                 else:
                     self.sudorun()
-        except Exception:
-            print('Action failed!')
+        except Exception as exe:
+            print('Failed to run command!')
+            print(exe)
 
     def on_run_entr(self, command):
-        self.on_run_clicked(run)
+        self.on_run_clicked('run')
 
     def xfixpress(self, xfixbutton):
         try:
             subprocess.Popen("xhost si:localuser:root", shell=True)
-        except Exception:
-            print("Action failed!")
+        except Exception as exe:
+            print("Running the command failed. Something wrong with")
+            print("your PC? This shouldn't be happening.")
+            print(exe)
 
 
 builder.connect_signals(rerunmain())
