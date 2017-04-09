@@ -26,15 +26,15 @@ GLADEFILE = PATH + "/rerun.ui"
 builder = Gtk.Builder()
 builder.add_from_file(GLADEFILE)
 window = builder.get_object('rerun')  # main window
-command = builder.get_object('command')  # main window
-run = builder.get_object('run')  # main window
+window.show_all()
+command = builder.get_object('command')
+run = builder.get_object('run')
 rootrun = builder.get_object('rootrun')
 rootpass = builder.get_object('rootpass')
 pron = builder.get_object('pron')
 proff = builder.get_object('proff')
 prdefault = builder.get_object('prdefault')
 prime = builder.get_object('prime')
-window.show_all()
 try:
     import subprocess  # for processes.
     import threading
