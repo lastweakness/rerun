@@ -3,7 +3,7 @@
 # SFRun is the same as Rerun but it'll almost never be updated and is contained
 # in a single file rather than multiple files. Don't know or care about speed.
 # This also does not go well with PEP8.
-# License at end.
+# License at the end.
 from __future__ import print_function
 import sys
 import os  # basics
@@ -434,7 +434,6 @@ def gload():
 
 
 gload()
-NULLMAKER = open(os.devnull, 'w')
 command = builder.get_object('command')
 pron = builder.get_object('pron')
 proff = builder.get_object('proff')
@@ -451,6 +450,7 @@ class thready(threading.Thread):
         self.sin = sin
 
     def run(self):
+        NULLMAKER = open(os.devnull, 'w')
         p = subprocess.Popen(self.cmd, shell=True,
                              stdin=self.sin,
                              stdout=NULLMAKER,
