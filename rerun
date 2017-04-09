@@ -126,8 +126,8 @@ Gtk.main()
 
 # Additional Notes and such:
 # 1. shell=True..... Yes. Yes. Its normally unsafe and not recomended but
-#    in this case, its perfectly safe as no stdin is ever accepted and
-#    is not saved. Please correct me if I'm wrong.
+#    in this case, its perfectly safe as no stdin is never accepted and
+#    is not saved. Please correct me if I'm wrong. Read (7) for exception.
 #
 # 2. NULLMAKER is a variable to /dev/null, this is where output is mostly
 #    redirected to.
@@ -135,7 +135,7 @@ Gtk.main()
 # 3. sudo vs gksudo and similar alternatives: As of now, gksudo, kdesudo,
 #    etc have been deprecated. But sudo still remains a feasible option.
 #    pkexec would have been a better option but it does not work with
-#    GUI applications.
+#    GUI applications on Wayland.
 #
 # 4. The code is structured based on suggestions from PEP8 and McCabe
 #    Complexity Check. So, this is as simple as it can get.
@@ -149,11 +149,12 @@ Gtk.main()
 #                                             '\n')
 #    ___________________________________________________________________
 #
-# 6. Why mulithreading? Because then, it won't freeze the app. To confirm,
-#    use above deprecated code to root-run Nautilus.
+# 6. Why mulithreading? Because then, it won't freeze the app and its better
+#    at things like memory management To confirm, use above deprecated code
+#    to root-run Nautilus.
 #
 # 7. STDIN in root-run: This pipe is closed immediately after password input
-#    and thus, should be safe.
+#    and thus, should be safe. I'm ok with corrections as said earlier.
 #
 # LICENSING:
 #
