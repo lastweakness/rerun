@@ -4,7 +4,7 @@
 # graphics switcher (run application with PRIME turned on). BUT thats all
 # it does. No added features, not many bug fixes or anything else.
 # No bloat whatsoever, no feature creep.
-# Licensing and other notes at end.
+# Licensing and other notes at the end.
 from __future__ import print_function
 import sys
 import os  # basics
@@ -32,7 +32,6 @@ def gload():
 
 
 gload()
-NULLMAKER = open(os.devnull, 'w')
 command = builder.get_object('command')
 pron = builder.get_object('pron')
 proff = builder.get_object('proff')
@@ -49,6 +48,7 @@ class thready(threading.Thread):
         self.sin = sin
 
     def run(self):
+        NULLMAKER = open(os.devnull, 'w')
         p = subprocess.Popen(self.cmd, shell=True,
                              stdin=self.sin,
                              stdout=NULLMAKER,
@@ -157,7 +157,7 @@ Gtk.main()
 #
 # LICENSING:
 #
-# rerun
+# Rerun
 # Copyright (C) 2017 Mufeed Ali
 #
 # This program is free software: you can redistribute it and/or modify
