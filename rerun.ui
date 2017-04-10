@@ -1,7 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.0 -->
+<!-- Generated with glade 3.20.0 
+
+Copyright (C) 2017 Mufeed Ali
+
+This file is part of Rerun.
+
+Rerun is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Rerun is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Rerun.  If not, see <http://www.gnu.org/licenses/>.
+
+Author: Mufeed Ali
+
+-->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk+" version="3.16"/>
+  <!-- interface-license-type gplv3 -->
+  <!-- interface-name Rerun -->
+  <!-- interface-description A tool to run GUI applications or simple commands with additional options and better support. -->
+  <!-- interface-copyright 2017 Mufeed Ali -->
+  <!-- interface-authors Mufeed Ali -->
   <object class="GtkWindow" id="rerun">
     <property name="can_focus">False</property>
     <property name="resizable">False</property>
