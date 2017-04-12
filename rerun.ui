@@ -30,7 +30,6 @@ Author: Mufeed Ali
   <!-- interface-authors Mufeed Ali -->
   <object class="GtkWindow" id="rerun">
     <property name="can_focus">False</property>
-    <property name="resizable">False</property>
     <property name="window_position">center</property>
     <property name="default_width">250</property>
     <property name="default_height">85</property>
@@ -283,6 +282,7 @@ Sometimes, graphical applications may not run under root. This is usually due to
             <property name="can_focus">False</property>
             <property name="margin_left">6</property>
             <property name="margin_right">6</property>
+            <property name="hexpand">True</property>
             <property name="spacing">8</property>
             <child>
               <object class="GtkLabel" id="safety">
@@ -297,7 +297,7 @@ Sometimes, graphical applications may not run under root. This is usually due to
                 <property name="use_markup">True</property>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
@@ -327,7 +327,7 @@ License: GNU GPLv3</property>
                 <property name="use_markup">True</property>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">2</property>
               </packing>
@@ -413,10 +413,11 @@ License: GNU GPLv3</property>
               <object class="GtkLabel" id="maintitle">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Rerun
-&lt;span size="x-small"&gt;Simple. Thats all.&lt;/span&gt;</property>
+                <property name="label" translatable="yes">&lt;span size="large"&gt;Rerun&lt;/span&gt;
+&lt;span size="xx-small"&gt;Simple. Thats all.&lt;/span&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="justify">right</property>
+                <property name="track_visited_links">False</property>
               </object>
               <packing>
                 <property name="expand">False</property>
