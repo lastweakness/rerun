@@ -36,7 +36,6 @@ command = builder.get_object('command')
 pron = builder.get_object('pron')
 proff = builder.get_object('proff')
 prdefault = builder.get_object('prdefault')
-# This is needed for ignoring unwanted terminal output.
 
 
 class thready(threading.Thread):
@@ -49,6 +48,7 @@ class thready(threading.Thread):
 
     def run(self):
         NULLMAKER = open(os.devnull, 'w')
+        # ^ This is needed for ignoring unwanted terminal output.
         p = subprocess.Popen(self.cmd, shell=True,
                              stdin=self.sin,
                              stdout=NULLMAKER,
@@ -109,15 +109,12 @@ class rerunmain():
             print('Failed to run command!')
             print(exe)
 
-    def on_run_entr(self, command):
-        self.on_run_clicked('run')
-
     def xfixpress(self, xfixbutton):
         try:
             subprocess.Popen("xhost si:localuser:root", shell=True)
         except Exception as exe:
             print("Running the command failed. Something wrong with")
-            print("your PC? This shouldn't be happening.")
+            print("your PC? This shouldn't be happening. Error:")
             print(exe)
 
 
