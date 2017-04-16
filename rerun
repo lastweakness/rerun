@@ -36,7 +36,6 @@ command = builder.get_object('command')
 pron = builder.get_object('pron')
 proff = builder.get_object('proff')
 prdefault = builder.get_object('prdefault')
-# This is needed for ignoring unwanted terminal output.
 
 
 class thready(threading.Thread):
@@ -49,6 +48,7 @@ class thready(threading.Thread):
 
     def run(self):
         NULLMAKER = open(os.devnull, 'w')
+        # ^ This is needed for ignoring unwanted terminal output.
         p = subprocess.Popen(self.cmd, shell=True,
                              stdin=self.sin,
                              stdout=NULLMAKER,
@@ -109,15 +109,12 @@ class rerunmain():
             print('Failed to run command!')
             print(exe)
 
-    def on_run_entr(self, command):
-        self.on_run_clicked('run')
-
     def xfixpress(self, xfixbutton):
         try:
             subprocess.Popen("xhost si:localuser:root", shell=True)
         except Exception as exe:
             print("Running the command failed. Something wrong with")
-            print("your PC? This shouldn't be happening.")
+            print("your PC? This shouldn't be happening. Error:")
             print(exe)
 
 
@@ -126,8 +123,8 @@ Gtk.main()
 
 # Additional Notes and such:
 # 1. shell=True..... Yes. Yes. Its normally unsafe and not recomended but
-#    in this case, its perfectly safe as no stdin is ever accepted and
-#    is not saved. Please correct me if I'm wrong.
+#    in this case, its perfectly safe as no stdin is never accepted and
+#    is not saved. Please correct me if I'm wrong. Read (7) for exception.
 #
 # 2. NULLMAKER is a variable to /dev/null, this is where output is mostly
 #    redirected to.
@@ -135,7 +132,7 @@ Gtk.main()
 # 3. sudo vs gksudo and similar alternatives: As of now, gksudo, kdesudo,
 #    etc have been deprecated. But sudo still remains a feasible option.
 #    pkexec would have been a better option but it does not work with
-#    GUI applications.
+#    GUI applications on Wayland.
 #
 # 4. The code is structured based on suggestions from PEP8 and McCabe
 #    Complexity Check. So, this is as simple as it can get.
@@ -149,16 +146,17 @@ Gtk.main()
 #                                             '\n')
 #    ___________________________________________________________________
 #
-# 6. Why mulithreading? Because then, it won't freeze the app. To confirm,
-#    use above deprecated code to root-run Nautilus.
+# 6. Why mulithreading? Because then, it won't freeze the app and its better
+#    at things like memory management To confirm, use above deprecated code
+#    to root-run Nautilus.
 #
 # 7. STDIN in root-run: This pipe is closed immediately after password input
-#    and thus, should be safe.
+#    and thus, should be safe. I'm ok with corrections as said earlier.
 #
 # LICENSING:
 #
 # Rerun
-# Copyright (C) 2017 Mufeed Ali
+# Copyright (C) 2017 Mufeed Ali [nightglare/mufeed20] <mufeed.ali53@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

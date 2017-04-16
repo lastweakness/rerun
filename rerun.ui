@@ -1,10 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.0 -->
+<!-- Generated with glade 3.20.0 
+
+Copyright (C) 2017 Mufeed Ali
+
+This file is part of Rerun.
+
+Rerun is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Rerun is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Rerun.  If not, see <http://www.gnu.org/licenses/>.
+
+Author: Mufeed Ali
+
+-->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk+" version="3.16"/>
+  <!-- interface-license-type gplv3 -->
+  <!-- interface-name Rerun -->
+  <!-- interface-description A tool to run GUI applications or simple commands with additional options and better support. -->
+  <!-- interface-copyright 2017 Mufeed Ali -->
+  <!-- interface-authors Mufeed Ali -->
   <object class="GtkWindow" id="rerun">
     <property name="can_focus">False</property>
-    <property name="resizable">False</property>
     <property name="window_position">center</property>
     <property name="default_width">250</property>
     <property name="default_height">85</property>
@@ -13,22 +38,21 @@
       <object class="GtkBox" id="activatables">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="margin_left">4</property>
+        <property name="margin_right">4</property>
         <property name="margin_top">4</property>
         <property name="margin_bottom">4</property>
         <property name="orientation">vertical</property>
+        <property name="spacing">4</property>
         <child>
           <object class="GtkBox" id="primebox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_top">1</property>
+            <property name="spacing">8</property>
             <child>
               <object class="GtkLabel" id="primelabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_left">8</property>
-                <property name="margin_right">8</property>
-                <property name="margin_top">4</property>
-                <property name="margin_bottom">4</property>
                 <property name="label" translatable="yes">PRIME:</property>
               </object>
               <packing>
@@ -102,10 +126,8 @@
                 <property name="tooltip_markup" translatable="yes">&lt;b&gt;This is ONLY for switchable graphics devices&lt;/b&gt;
 This has NO effect, negative or positive, on single graphics devices.
 This sets the state of use of Discrete cards on switchable graphics devices. It is the same as using (or not using) the DRI_PRIME environment variable.</property>
-                <property name="margin_left">8</property>
-                <property name="margin_right">8</property>
-                <property name="margin_top">4</property>
-                <property name="margin_bottom">4</property>
+                <property name="margin_top">2</property>
+                <property name="margin_bottom">2</property>
                 <property name="icon_name">help-info-symbolic</property>
               </object>
               <packing>
@@ -126,38 +148,21 @@ This sets the state of use of Discrete cards on switchable graphics devices. It 
           <object class="GtkBox" id="rootbox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_top">1</property>
             <property name="spacing">8</property>
             <child>
-              <object class="GtkLabel" id="rootlab">
+              <object class="GtkImage" id="rootsafe">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_left">8</property>
-                <property name="margin_right">8</property>
-                <property name="margin_top">4</property>
-                <property name="margin_bottom">4</property>
-                <property name="label" translatable="yes">Run As Root</property>
-                <property name="use_markup">True</property>
+                <property name="tooltip_markup" translatable="yes">Running graphical applications as root is not recommended.
+The recommended way to run anything as root is &lt;b&gt;pkexec&lt;/b&gt; and it works very well with X11.
+However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not work with Wayland, which is the default display protocol for GNOME, which is what I use.</property>
+                <property name="icon_name">help-info-symbolic</property>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
+                <property name="pack_type">end</property>
                 <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="rootpass">
-                <property name="can_focus">True</property>
-                <property name="tooltip_markup" translatable="yes">This is &lt;b&gt;NOT&lt;/b&gt; root password. Just the User password.</property>
-                <property name="margin_top">2</property>
-                <property name="margin_bottom">2</property>
-                <property name="visibility">False</property>
-                <property name="placeholder_text" translatable="yes">User Password</property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
               </packing>
             </child>
             <child>
@@ -166,30 +171,38 @@ This sets the state of use of Discrete cards on switchable graphics devices. It 
                 <property name="can_focus">True</property>
                 <property name="margin_left">8</property>
                 <property name="margin_right">8</property>
-                <property name="margin_top">4</property>
-                <property name="margin_bottom">4</property>
                 <accelerator key="r" signal="activate" modifiers="GDK_CONTROL_MASK"/>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="pack_type">end</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="rootlab">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Run As Root</property>
+                <property name="use_markup">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
                 <property name="position">2</property>
               </packing>
             </child>
             <child>
-              <object class="GtkImage" id="rootsafe">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">Running graphical applications as root is not recommended.
-The recommended way to run anything as root is &lt;b&gt;pkexec&lt;/b&gt; and it works very well with X11.
-However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not work with Wayland, which is the default display protocol for GNOME, which is what I use.</property>
-                <property name="margin_top">4</property>
-                <property name="margin_bottom">4</property>
-                <property name="icon_name">help-info-symbolic</property>
+              <object class="GtkEntry" id="rootpass">
+                <property name="can_focus">True</property>
+                <property name="tooltip_markup" translatable="yes">This is &lt;b&gt;NOT&lt;/b&gt; root password. Just the User password.</property>
+                <property name="visibility">False</property>
+                <property name="activates_default">True</property>
+                <property name="placeholder_text" translatable="yes">User Password</property>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">3</property>
               </packing>
@@ -205,23 +218,18 @@ However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not 
           <object class="GtkBox" id="xfix">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_bottom">4</property>
             <property name="spacing">8</property>
             <child>
               <object class="GtkButton" id="xfixbutton">
-                <property name="label" translatable="yes">Fix 'cannot open display' on Root</property>
+                <property name="label" translatable="yes">Fix 'Run As Root' on Wayland</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="margin_left">8</property>
-                <property name="margin_right">8</property>
-                <property name="margin_top">4</property>
-                <property name="margin_bottom">4</property>
-                <property name="hexpand">True</property>
+                <property name="receives_default">False</property>
+                <property name="relief">half</property>
                 <signal name="clicked" handler="xfixpress" swapped="no"/>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
@@ -230,10 +238,10 @@ However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not 
               <object class="GtkImage" id="xfixinfo">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">&lt;b&gt;This is not usually needed&lt;/b&gt;
-Sometimes, graphical applications may not run under root. This is usually due to xhost not allowing it to. So, this fix (or workaround) tells xhost to allow root to run graphical applications.</property>
+                <property name="tooltip_markup" translatable="yes">&lt;b&gt;This is usually only needed on Wayland&lt;/b&gt;
+On Wayland, GUI applications may not run as root due to xhost access control. This can be worked around every boot by clicking this button. Better yet, you can make this command run on every boot (this feature will be built-in in an upcoming release). 
+This fix (or workaround) tells xhost to allow root to run graphical applications. It is the same as running "xhost si:localuser:root" on every boot.</property>
                 <property name="margin_left">8</property>
-                <property name="margin_right">8</property>
                 <property name="margin_top">4</property>
                 <property name="margin_bottom">4</property>
                 <property name="icon_name">help-info-symbolic</property>
@@ -241,6 +249,7 @@ Sometimes, graphical applications may not run under root. This is usually due to
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
+                <property name="pack_type">end</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -255,23 +264,26 @@ Sometimes, graphical applications may not run under root. This is usually due to
           <object class="GtkBox" id="hovers">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">6</property>
-            <property name="margin_right">6</property>
+            <property name="hexpand">True</property>
             <property name="spacing">8</property>
             <child>
               <object class="GtkLabel" id="safety">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">Rerun might be simple, as is the commandline. But just as in the commandline, you have to try and be safe.
+                <property name="tooltip_markup" translatable="yes">&lt;b&gt;Warnings&lt;/b&gt;
+Rerun might be simple, as is the commandline. But just as in the commandline, you have to try and be safe.
  1. Do NOT randomly copy and paste commands from the internet.
  2. Review every command carefully may it be a root command or otherwise (eg: systemctl)
  3. Do not do random typing.
- 4. Rerun uses the same syntax as shell. &lt;span size="x-small"&gt;[shell=True if you know python]&lt;/span&gt; This also means that you can run non-graphical commands like 'rm'. So, be careful and &lt;b&gt;DON'T&lt;/b&gt; run " rm * " or anything of the sort.</property>
+ 4. Rerun is basically a shell interface. &lt;span size="x-small"&gt;[shell=True if you know python]&lt;/span&gt; This also means that you can run non-graphical commands like 'rm'. So, be careful and &lt;b&gt;DON'T&lt;/b&gt; run " rm * " or anything of the sort.
+&lt;b&gt;Tips&lt;/b&gt;
+ 1. As said before, Rerun is a GUI for shell. So, it also has a default working directory, which is wherever it is run from. You could even use cd to go into other working directories. It also supports multiple commands in one string, for example, "sleep 3h; systemctl shutdown". That would work and so would "cd ~ ; ./myscript.sh" given that they're all real paths accessible from shell.
+ 2. The command seen earlier, "sleep 3h ; systemctl shutdown", is a nice way to schedule a shutdown using Rerun. In this case, it shuts down after 3 hours.</property>
                 <property name="label" translatable="yes">&lt;b&gt;Safety Warnings and Tips&lt;/b&gt; &lt;span size="x-small"&gt;[hover over to read]&lt;/span&gt;</property>
                 <property name="use_markup">True</property>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
@@ -293,7 +305,8 @@ Sometimes, graphical applications may not run under root. This is usually due to
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">&lt;span size="large"&gt;About Rerun&lt;/span&gt;
 Rerun is a tool to run shell commands or applications directly while ignoring output and disallowing input. This allows quickly running applications like gedit or nautilus.
-Rerun has a few tricks up its sleeve: Support for switchable graphics, Run As Root and a tiny fix.
+Rerun has a few tricks up its sleeve: Support for switchable graphics, Run As Root and a tiny fix. It is also very highly optimized for speed. Anything the shell can do, Rerun can do too but just safer and with no output.
+Everything was made from ground-up to be customizable and easy to use and fast. So, enjoy!
 
 Author: Mufeed Ali &lt;span size="x-small"&gt;[nightglare or mufeed20 or mufeed2000][mufeed.ali53@gmail.com]&lt;/span&gt;
 License: GNU GPLv3</property>
@@ -301,7 +314,7 @@ License: GNU GPLv3</property>
                 <property name="use_markup">True</property>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">2</property>
               </packing>
@@ -335,10 +348,8 @@ License: GNU GPLv3</property>
                 <property name="can_focus">True</property>
                 <property name="has_focus">True</property>
                 <property name="is_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="has_default">True</property>
                 <property name="hexpand">True</property>
-                <signal name="activate" handler="on_run_entr" swapped="no"/>
+                <property name="activates_default">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -362,6 +373,8 @@ License: GNU GPLv3</property>
                 <property name="label" translatable="yes">Run</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
                 <signal name="clicked" handler="on_run_clicked" swapped="no"/>
@@ -387,10 +400,11 @@ License: GNU GPLv3</property>
               <object class="GtkLabel" id="maintitle">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Rerun
-&lt;span size="x-small"&gt;Simple. Thats all.&lt;/span&gt;</property>
+                <property name="label" translatable="yes">&lt;span size="large"&gt;Rerun&lt;/span&gt;
+&lt;span size="xx-small"&gt;Simple. Thats all.&lt;/span&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="justify">right</property>
+                <property name="track_visited_links">False</property>
               </object>
               <packing>
                 <property name="expand">False</property>
