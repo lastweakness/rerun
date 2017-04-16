@@ -10,6 +10,7 @@ Rerun is a tool to run shell commands and GUI applications by just typing the co
  7. Modern with support for Wayland (including running apps as root under wayland)
  8. Comes with tips and a fix for possible issue faced.
  9. Uses multithreading to prevent conflicts and also to prevent freezes.
+ 10. Simple code with less than 200 lines. (master branch)
 
 Rerun's master branch is perfectly stable with no reasons to not use it.
 

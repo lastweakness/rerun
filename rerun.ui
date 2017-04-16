@@ -224,7 +224,7 @@ However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not 
                 <property name="label" translatable="yes">Fix 'Run As Root' on Wayland</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="receives_default">False</property>
                 <property name="relief">half</property>
                 <signal name="clicked" handler="xfixpress" swapped="no"/>
               </object>
@@ -305,7 +305,8 @@ Rerun might be simple, as is the commandline. But just as in the commandline, yo
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">&lt;span size="large"&gt;About Rerun&lt;/span&gt;
 Rerun is a tool to run shell commands or applications directly while ignoring output and disallowing input. This allows quickly running applications like gedit or nautilus.
-Rerun has a few tricks up its sleeve: Support for switchable graphics, Run As Root and a tiny fix.
+Rerun has a few tricks up its sleeve: Support for switchable graphics, Run As Root and a tiny fix. It is also very highly optimized for speed. Anything the shell can do, Rerun can do too but just safer and with no output.
+Everything was made from ground-up to be customizable and easy to use and fast. So, enjoy!
 
 Author: Mufeed Ali &lt;span size="x-small"&gt;[nightglare or mufeed20 or mufeed2000][mufeed.ali53@gmail.com]&lt;/span&gt;
 License: GNU GPLv3</property>
@@ -347,10 +348,8 @@ License: GNU GPLv3</property>
                 <property name="can_focus">True</property>
                 <property name="has_focus">True</property>
                 <property name="is_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="has_default">True</property>
                 <property name="hexpand">True</property>
-                <signal name="activate" handler="on_run_entr" swapped="no"/>
+                <property name="activates_default">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -374,6 +373,8 @@ License: GNU GPLv3</property>
                 <property name="label" translatable="yes">Run</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
                 <signal name="clicked" handler="on_run_clicked" swapped="no"/>
