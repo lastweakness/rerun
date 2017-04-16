@@ -11,6 +11,8 @@ Rerun is a tool to run shell commands and GUI applications by just typing the co
  8. Comes with tips and a fix for possible issue faced.
  9. Uses multithreading to prevent conflicts and also to prevent freezes.
 
+Rerun's master branch is perfectly stable with no reasons to not use it.
+
 ## Explanations and Reasoning
 
 #### Why sudo and not pkexec?
