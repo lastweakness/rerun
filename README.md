@@ -29,7 +29,7 @@ Also, Rerun has no auto-complete feature as with KDE's Alt-F2 interface.
 Maybe in the future. But for now, focus is on stabilizing and standardizing the code. I will never implement a full-fledged search interface or anything like that. Maybe something that simply browses /bin and /usr/bin.
 
 #### Do standards matter to you?
-Yes. Absolutely. The python code is PEP8-compliant and non-complex according to McCabe. The XML is valid as expected from Glade.
+Yes. Absolutely. The python code is almost PEP8-compliant (tiny sacrifice made for speed, one rule broken) and non-complex according to McCabe. The XML is valid as expected from Glade.
 
 #### Then, isn't shell=True unsafe?
 No, not in this case. In this case, the command run is from the user anyway and the user could do the same thing from his terminal.

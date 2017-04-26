@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Rerun is a GTK+3 application launcher, command runner, root runner and
+# Rerun is a Gtk+3 application launcher, command runner, root runner and
 # graphics switcher (run application with PRIME turned on). BUT thats all
 # it does. No added features, not many bug fixes or anything else.
 # No bloat whatsoever, no feature creep.
@@ -8,8 +8,6 @@
 from __future__ import print_function
 import sys
 import os  # basics
-import subprocess  # for processes.
-import threading
 try:
     import gi
     gi.require_version('Gtk', '3.0')  # inform the PC that we need GTK+ 3.
@@ -32,6 +30,9 @@ def gload():
 
 
 gload()
+import subprocess  # for processes.
+import threading
+# ^ Yea. I just violated PEP8 to get a savings of about 300 ms.
 command = builder.get_object('command')
 pron = builder.get_object('pron')
 proff = builder.get_object('proff')
