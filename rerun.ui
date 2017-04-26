@@ -125,7 +125,8 @@ Author: Mufeed Ali
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">&lt;b&gt;This is ONLY for switchable graphics devices&lt;/b&gt;
 This has NO effect, negative or positive, on single graphics devices.
-This sets the state of use of Discrete cards on switchable graphics devices. It is the same as using (or not using) the DRI_PRIME environment variable.</property>
+This sets the state of use of Discrete cards on switchable graphics devices. It is the same as using (or not using) the DRI_PRIME environment variable.
+&lt;b&gt;NOTE&lt;/b&gt;: If you use PRIME while running applications as root, it is suggested to use sudo as pkexec remains untested.</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
                 <property name="icon_name">help-info-symbolic</property>
@@ -154,8 +155,8 @@ This sets the state of use of Discrete cards on switchable graphics devices. It 
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">Running graphical applications as root is not recommended.
-The recommended way to run anything as root is &lt;b&gt;pkexec&lt;/b&gt; and it works very well with X11.
-However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not work with Wayland, which is the default display protocol for GNOME, which is what I use.</property>
+The recommended way to run anything as root is &lt;b&gt;pkexec&lt;/b&gt; and it works very well with X11 and as of recently, Wayland too. Therefore, pkexec is the current default method for running applications as root.
+In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not work with everything you wish to use. But sudo is &lt;b&gt;not&lt;/b&gt; recommended and the better option is always &lt;b&gt;pkexec&lt;/b&gt;.</property>
                 <property name="icon_name">help-info-symbolic</property>
               </object>
               <packing>
@@ -166,26 +167,56 @@ However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not 
               </packing>
             </child>
             <child>
-              <object class="GtkSwitch" id="rootrun">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="margin_left">8</property>
-                <property name="margin_right">8</property>
-                <accelerator key="r" signal="activate" modifiers="GDK_CONTROL_MASK"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="pack_type">end</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkLabel" id="rootlab">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Run As Root</property>
                 <property name="use_markup">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="rootopt">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkRadioButton" id="pkexecopt">
+                    <property name="label" translatable="yes">pkexec</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="tooltip_markup" translatable="yes">pkexec is the new &lt;b&gt;standard&lt;/b&gt; way of executing applications as root. This is recommended way to go.</property>
+                    <property name="active">True</property>
+                    <property name="draw_indicator">True</property>
+                    <signal name="clicked" handler="pktoggle" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkRadioButton" id="sudopt">
+                    <property name="label" translatable="yes">sudo</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="tooltip_markup" translatable="yes">Running GUI apps with sudo is &lt;b&gt;not&lt;/b&gt; recommended.</property>
+                    <property name="draw_indicator">True</property>
+                    <property name="group">pkexecopt</property>
+                    <signal name="clicked" handler="sutoggle" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -204,6 +235,22 @@ However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not 
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSwitch" id="rootrun">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="margin_left">8</property>
+                <property name="margin_right">8</property>
+                <signal name="state-set" handler="switched" swapped="no"/>
+                <accelerator key="r" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="pack_type">end</property>
                 <property name="position">3</property>
               </packing>
             </child>
@@ -350,6 +397,7 @@ License: GNU GPLv3</property>
                 <property name="is_focus">True</property>
                 <property name="hexpand">True</property>
                 <property name="activates_default">True</property>
+                <property name="placeholder_text" translatable="yes">Type your command here...</property>
               </object>
               <packing>
                 <property name="expand">False</property>

@@ -37,6 +37,12 @@ command = builder.get_object('command')
 pron = builder.get_object('pron')
 proff = builder.get_object('proff')
 prdefault = builder.get_object('prdefault')
+rootpass = builder.get_object('rootpass')
+pkexecopt = builder.get_object('pkexecopt')
+sudopt = builder.get_object('sudopt')
+rootpass.set_sensitive(False)
+pkexecopt.set_sensitive(False)
+sudopt.set_sensitive(False)
 
 
 class thready(threading.Thread):
@@ -64,39 +70,58 @@ class rerunmain():
     def on_window_destroy(self, rerun):
         Gtk.main_quit()
 
+    def pktoggle(self, pkexecopt):
+        rootpass.set_sensitive(False)
+
+    def sutoggle(self, sudopt):
+        rootpass.set_sensitive(True)
+
+    def switched(self, rootrun, crap=None):
+        rootrun = builder.get_object('rootrun')
+        if rootrun.get_active():
+            pkexecopt.set_sensitive(True)
+            sudopt.set_sensitive(True)
+        else:
+            pkexecopt.set_sensitive(False)
+            sudopt.set_sensitive(False)
+
     def regrun(self):
         if prdefault.get_active():
             thread = thready(command.get_text())
-            thread.start()
-            thread.join()
         elif pron.get_active():
             thread = thready("env DRI_PRIME=1 " + command.get_text())
-            thread.start()
-            thread.join()
         elif proff.get_active():
             thread = thready("env DRI_PRIME=0 " + command.get_text())
-            thread.start()
-            thread.join()
+        thread.start()
+        thread.join()
 
     def sudorun(self):
-        rootpass = builder.get_object('rootpass')
         if prdefault.get_active():
-            thread = thready('sudo -S "' + command.get_text().strip() +
-                             '"', subprocess.PIPE, True, rootpass.get_text())
-            thread.start()
-            thread.join()
+            if rootpass.get_sensitive():
+                thread = thready('sudo -S "' + command.get_text().strip() +
+                                 '"', subprocess.PIPE, True,
+                                 rootpass.get_text())
+            else:
+                thread = thready('pkexec "' + command.get_text().strip() +
+                                 '"')
         elif pron.get_active():
-            thread = thready("env DRI_PRIME=1 " + 'sudo -S "' +
-                             command.get_text().strip() +
-                             '"', subprocess.PIPE, True, rootpass.get_text())
-            thread.start()
-            thread.join()
+            thread = self.primeroot(rootpass, command, 1)
         elif proff.get_active():
-            thread = thready("env DRI_PRIME=0 " + 'sudo -S "' +
-                             command.get_text().strip() +
-                             '"', subprocess.PIPE, True, rootpass.get_text())
-            thread.start()
-            thread.join()
+            thread = self.primeroot(rootpass, command, 0)
+        thread.start()
+        thread.join()
+
+    def primeroot(self, rootpass, command, primeval):
+        if rootpass.get_sensitive():
+            thread = thready("env DRI_PRIME=" + str(primeval) + " " +
+                             'sudo -S "' + command.get_text().strip() +
+                             '"', subprocess.PIPE, True,
+                             rootpass.get_text())
+        else:
+            thread = thready("env DRI_PRIME=" + str(primeval) + " " +
+                             'pkexec "' + command.get_text().strip() +
+                             '"')
+        return thread
 
     def on_run_clicked(self, run):
         rootrun = builder.get_object('rootrun')

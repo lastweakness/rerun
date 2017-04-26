@@ -17,6 +17,7 @@ Rerun's master branch is perfectly stable with no reasons to not use it.
 ## Explanations and Reasoning
 
 #### Why sudo and not pkexec?
+**UPDATE**: Rerun now supports pkexec as well. However, it is untested for Switchable Graphics devices. AND as of GNOME 3.24, pkexec does work as expected in Wayland.  
 Well, for one, pkexec does not support Wayland while trying to run graphical applications.  
 For another, pkexec requires every application to have a seperate policy file. Some applications that require root are yet to support this.  
 However, I do plan on supporting pkexec in the next release. But it won't be the default and sudo will stay default until pkexec gets proper Wayland support. It will instead be added as a togglable option just like with Switchable Graphics.
