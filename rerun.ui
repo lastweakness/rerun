@@ -449,7 +449,7 @@ License: GNU GPLv3</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">&lt;span size="large"&gt;Rerun&lt;/span&gt;
-&lt;span size="xx-small"&gt;Simple. Thats all.&lt;/span&gt;</property>
+&lt;span size="x-small"&gt;Simple. Thats all.&lt;/span&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="justify">right</property>
                 <property name="track_visited_links">False</property>
