@@ -21,8 +21,7 @@ except ImportError as imper:
 
 def gload():
     global builder
-    PATH = os.path.dirname(os.path.realpath(__file__))
-    GLADEFILE = PATH + "/rerun.ui"
+    GLADEFILE = os.path.dirname(os.path.realpath(__file__)) + "/rerun.ui"
     builder = Gtk.Builder()
     builder.add_from_file(GLADEFILE)
     window = builder.get_object('rerun')  # main window
@@ -46,23 +45,29 @@ sudopt.set_sensitive(False)
 
 
 class thready(threading.Thread):
-    def __init__(self, cmd, sin=None, root=False, rpass=None):
+    def __init__(self, cmd, sin=None, root=False, rpass=None, prime=0):
         threading.Thread.__init__(self)
         self.cmd = cmd
         self.root = root
         self.rpass = rpass
         self.sin = sin
+        self.prime = prime
 
     def run(self):
+        denvi = os.environ.copy()
         NULLMAKER = open(os.devnull, 'w')
-        # ^ This is needed for ignoring unwanted terminal output.
-        p = subprocess.Popen(self.cmd, shell=True,
+        if self.prime == 1:
+            denvi["DRI_PRIME"] = "0"
+        elif self.prime == 2:
+            denvi["DRI_PRIME"] = "1"
+        p = subprocess.Popen(self.cmd,
                              stdin=self.sin,
+                             shell=True,
                              stdout=NULLMAKER,
-                             stderr=subprocess.STDOUT,
-                             universal_newlines=True)
+                             stderr=NULLMAKER,
+                             env=denvi)
         if self.root:
-            p.stdin.write(self.rpass + '\n')
+            p.stdin.write(self.rpass.encode() + b'\n')
             p.stdin.close()
 
 
@@ -89,9 +94,9 @@ class rerunmain():
         if prdefault.get_active():
             thread = thready(command.get_text())
         elif pron.get_active():
-            thread = thready("env DRI_PRIME=1 " + command.get_text())
+            thread = thready(command.get_text(), prime=2)
         elif proff.get_active():
-            thread = thready("env DRI_PRIME=0 " + command.get_text())
+            thread = thready(command.get_text(), prime=1)
         thread.start()
         thread.join()
 
@@ -113,14 +118,12 @@ class rerunmain():
 
     def primeroot(self, rootpass, command, primeval):
         if rootpass.get_sensitive():
-            thread = thready("env DRI_PRIME=" + str(primeval) + " " +
-                             'sudo -S "' + command.get_text().strip() +
+            thread = thready('sudo -S "' + command.get_text().strip() +
                              '"', subprocess.PIPE, True,
-                             rootpass.get_text())
+                             rootpass.get_text(), primeval + 1)
         else:
-            thread = thready("env DRI_PRIME=" + str(primeval) + " " +
-                             'pkexec "' + command.get_text().strip() +
-                             '"')
+            thread = thready('pkexec "' + command.get_text().strip() +
+                             '"', primeval + 1)
         return thread
 
     def on_run_clicked(self, run):
@@ -137,7 +140,8 @@ class rerunmain():
 
     def xfixpress(self, xfixbutton):
         try:
-            subprocess.Popen("xhost si:localuser:root", shell=True)
+            subprocess.Popen(["xhost", "si:localuser:root"],
+                             stdout=open(os.devnull, 'w'))
         except Exception as exe:
             print("Running the command failed. Something wrong with")
             print("your PC? This shouldn't be happening. Error:")
@@ -147,53 +151,29 @@ class rerunmain():
 builder.connect_signals(rerunmain())
 Gtk.main()
 
-# Additional Notes and such:
-# 1. shell=True..... Yes. Yes. Its normally unsafe and not recomended but
-#    in this case, its perfectly safe as no stdin is never accepted and
-#    is not saved. Please correct me if I'm wrong. Read (7) for exception.
-#
-# 2. NULLMAKER is a variable to /dev/null, this is where output is mostly
-#    redirected to.
-#
-# 3. sudo vs gksudo and similar alternatives: As of now, gksudo, kdesudo,
-#    etc have been deprecated. But sudo still remains a feasible option.
-#    pkexec would have been a better option but it does not work with
-#    GUI applications on Wayland.
-#
-# 4. The code is structured based on suggestions from PEP8 and McCabe
-#    Complexity Check. So, this is as simple as it can get.
-#
-# 5. DEPRECATED, NON-MULTITHREADED CODE FOR REFERENCE:
-#    ___________________________________________________________________
-#    subprocess.Popen('sudo -S "' + command.get_text().strip() +
-#                     '"', stdout=NULLMAKER, stdin=subprocess.PIPE,
-#                     stderr=subprocess.STDOUT, universal_newlines=True,
-#                     shell=True).communicate(rootpass.get_text() +
-#                                             '\n')
-#    ___________________________________________________________________
-#
-# 6. Why mulithreading? Because then, it won't freeze the app and its better
-#    at things like memory management To confirm, use above deprecated code
-#    to root-run Nautilus.
-#
-# 7. STDIN in root-run: This pipe is closed immediately after password input
-#    and thus, should be safe. I'm ok with corrections as said earlier.
-#
 # LICENSING:
 #
-# Rerun
-# Copyright (C) 2017 Mufeed Ali [nightglare/mufeed20] <mufeed.ali53@gmail.com>
+# The MIT License (MIT)
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Copyright (c) 2017 Mufeed Ali
+# This file is part of Rerun
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# Author: Mufeed Ali
