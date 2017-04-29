@@ -8,6 +8,7 @@
 from __future__ import print_function
 import sys
 import os  # basics
+
 try:
     import gi
     gi.require_version('Gtk', '3.0')  # inform the PC that we need GTK+ 3.
