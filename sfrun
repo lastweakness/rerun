@@ -7,8 +7,7 @@
 from __future__ import print_function
 import sys
 import os  # basics
-import subprocess  # for processes.
-import threading
+
 try:
     import gi
     gi.require_version('Gtk', '3.0')  # inform the PC that we need GTK+ 3.
@@ -18,26 +17,33 @@ except ImportError as imper:
     print("Install GObject bindings.")
     print(imper)
     sys.exit(0)
+
 builder = Gtk.Builder()
 builder.add_from_string("""<?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.0 
+<!-- Generated with glade 3.20.0
 
-Copyright (C) 2017 Mufeed Ali
+The MIT License (MIT)
 
-This file is part of Rerun.
+Copyright (c) 2017 Mufeed Ali
+This file is part of Rerun
 
-Rerun is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-Rerun is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-You should have received a copy of the GNU General Public License
-along with Rerun.  If not, see <http://www.gnu.org/licenses/>.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 Author: Mufeed Ali
 
@@ -46,7 +52,8 @@ Author: Mufeed Ali
   <requires lib="gtk+" version="3.16"/>
   <!-- interface-license-type gplv3 -->
   <!-- interface-name Rerun -->
-  <!-- interface-description A tool to run GUI applications or simple commands with additional options and better support. -->
+  <!-- interface-description A tool to run GUI applications or""" +
+                        """ simple commands with additional options and better support. -->
   <!-- interface-copyright 2017 Mufeed Ali -->
   <!-- interface-authors Mufeed Ali -->
   <object class="GtkWindow" id="rerun">
@@ -88,7 +95,8 @@ Author: Mufeed Ali
                 <property name="can_focus">False</property>
                 <child>
                   <object class="GtkRadioButton" id="prdefault">
-                    <property name="label" translatable="yes">Default</property>
+                    <property name="label" translatable="yes">""" +
+                        """Default</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -103,7 +111,8 @@ Author: Mufeed Ali
                 </child>
                 <child>
                   <object class="GtkRadioButton" id="pron">
-                    <property name="label" translatable="yes">Enabled</property>
+                    <property name="label" translatable="yes">""" +
+                        """Enabled</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -119,7 +128,8 @@ Author: Mufeed Ali
                 </child>
                 <child>
                   <object class="GtkRadioButton" id="proff">
-                    <property name="label" translatable="yes">Disabled</property>
+                    <property name="label" translatable="yes">""" +
+                        """Disabled</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -144,9 +154,15 @@ Author: Mufeed Ali
               <object class="GtkImage" id="primewhat">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">&lt;b&gt;This is ONLY for switchable graphics devices&lt;/b&gt;
+                <property name="tooltip_markup" translatable="yes">&lt;""" +
+                        """b&gt;This is ONLY for switchable graphics devices&lt;/b&gt;
 This has NO effect, negative or positive, on single graphics devices.
-This sets the state of use of Discrete cards on switchable graphics devices. It is the same as using (or not using) the DRI_PRIME environment variable.</property>
+This sets the state of use of Discrete cards on switchable graphics""" +
+                        """ devices. It is the same as using (or no""" +
+                        """t using) the DRI_PRIME environment variable.
+&lt;b&gt;NOTE&lt;/b&gt;: If you use PRIME while running application""" +
+                        """s as root, it is suggested to use sudo as""" +
+                        """ pkexec remains untested.</property>
                 <property name="margin_top">2</property>
                 <property name="margin_bottom">2</property>
                 <property name="icon_name">help-info-symbolic</property>
@@ -174,9 +190,20 @@ This sets the state of use of Discrete cards on switchable graphics devices. It 
               <object class="GtkImage" id="rootsafe">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">Running graphical applications as root is not recommended.
-The recommended way to run anything as root is &lt;b&gt;pkexec&lt;/b&gt; and it works very well with X11.
-However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not work with Wayland, which is the default display protocol for GNOME, which is what I use.</property>
+                <property name="tooltip_markup" translatable""" +
+                        """="yes">Running graphical applications""" +
+                        """ as root is not recommended.
+The recommended way to run anything as root is &lt;b&gt;pkexec&lt""" +
+                        """;/b&gt; and it works very well with X11""" +
+                        """ and as of recently, Wayland too. Therefore""" +
+                        """, pkexec is the current default method for""" +
+                        """ running applications as root.
+In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as""" +
+                        """ pkexec may not work with everything""" +
+                        """ you wish to use. But sudo is &lt;b&gt""" +
+                        """;not&lt;/b&gt; recommended and the better""" +
+                        """ option is always &lt;b&gt;pkexec&lt;/b&""" +
+                        """gt;.</property>
                 <property name="icon_name">help-info-symbolic</property>
               </object>
               <packing>
@@ -187,26 +214,63 @@ However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not 
               </packing>
             </child>
             <child>
-              <object class="GtkSwitch" id="rootrun">
+              <object class="GtkLabel" id="rootlab">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="margin_left">8</property>
-                <property name="margin_right">8</property>
-                <accelerator key="r" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Run As R""" +
+                        """oot</property>
+                <property name="use_markup">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
                 <property name="position">1</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="rootlab">
+              <object class="GtkBox" id="rootopt">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Run As Root</property>
-                <property name="use_markup">True</property>
+                <child>
+                  <object class="GtkRadioButton" id="pkexecopt">
+                    <property name="label" translatable="yes">pkexec</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="tooltip_markup" translatable""" +
+                        """="yes">pkexec is the new &lt;b&gt;sta""" +
+                        """ndard&lt;/b&gt; way of executing appl""" +
+                        """ications as root. This is recommended""" +
+                        """ way to go.</property>
+                    <property name="active">True</property>
+                    <property name="draw_indicator">True</property>
+                    <signal name="clicked" handler="pktoggle" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkRadioButton" id="sudopt">
+                    <property name="label" translatable="yes">sudo</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="tooltip_markup" translatable""" +
+                        """="yes">Running GUI apps with sudo is &lt;""" +
+                        """b&gt;not&lt;/b&gt; recommended.</property>
+                    <property name="draw_indicator">True</property>
+                    <property name="group">pkexecopt</property>
+                    <signal name="clicked" handler="sutoggle" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -217,14 +281,34 @@ However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not 
             <child>
               <object class="GtkEntry" id="rootpass">
                 <property name="can_focus">True</property>
-                <property name="tooltip_markup" translatable="yes">This is &lt;b&gt;NOT&lt;/b&gt; root password. Just the User password.</property>
+                <property name="tooltip_markup" translatable="yes">""" +
+                        """This is &lt;b&gt;NOT&lt;/b&gt; root pass""" +
+                        """word. Just the User password.</property>
                 <property name="visibility">False</property>
                 <property name="activates_default">True</property>
-                <property name="placeholder_text" translatable="yes">User Password</property>
+                <property name="placeholder_text" translatable="ye""" +
+                        """s">User Password</property>
               </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSwitch" id="rootrun">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="margin_top">2</property>
+                <property name="margin_bottom">2</property>
+                <signal name="state-set" handler="switched" swapped="no"/>
+                <accelerator key="r" signal="activate" modif""" +
+                        """iers="GDK_CONTROL_MASK"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="pack_type">end</property>
                 <property name="position">3</property>
               </packing>
             </child>
@@ -242,7 +326,8 @@ However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not 
             <property name="spacing">8</property>
             <child>
               <object class="GtkButton" id="xfixbutton">
-                <property name="label" translatable="yes">Fix 'Run As Root' on Wayland</property>
+                <property name="label" translatable="yes">"""
+                        """Fix 'Run As Root' on Wayland</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -259,9 +344,20 @@ However, in Rerun, &lt;b&gt;sudo&lt;/b&gt; is set to default as pkexec does not 
               <object class="GtkImage" id="xfixinfo">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">&lt;b&gt;This is usually only needed on Wayland&lt;/b&gt;
-On Wayland, GUI applications may not run as root due to xhost access control. This can be worked around every boot by clicking this button. Better yet, you can make this command run on every boot (this feature will be built-in in an upcoming release). 
-This fix (or workaround) tells xhost to allow root to run graphical applications. It is the same as running "xhost si:localuser:root" on every boot.</property>
+                <property name="tooltip_markup" translatable""" +
+                        """="yes">&lt;b&gt;This is usually o""" +
+                        """nly needed on Wayland&lt;/b&gt;
+On Wayland, GUI applications may not run as root due to xhos""" +
+                        """t access control. This can be wor""" +
+                        """ked around every boot by clicking""" +
+                        """ this button. Better yet, you can""" +
+                        """ make this command run on every b""" +
+                        """oot (this feature will be built-in""" +
+                        """ in an upcoming release).
+This fix (or workaround) tells xhost to allow root to run grap""" +
+                        """hical applications. It is the same """ +
+                        """as running "xhost si:localuser:ro""" +
+                        """ot" on every boot.</property>
                 <property name="margin_left">8</property>
                 <property name="margin_top">4</property>
                 <property name="margin_bottom">4</property>
@@ -291,8 +387,10 @@ This fix (or workaround) tells xhost to allow root to run graphical applications
               <object class="GtkLabel" id="safety">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">&lt;b&gt;Warnings&lt;/b&gt;
-Rerun might be simple, as is the commandline. But just as in the commandline, you have to try and be safe.
+                <property name="tooltip_markup" translatable""" +
+                        """="yes">&lt;b&gt;Warnings&lt;/b&gt;
+Rerun might be simple, as is the commandline. But just as in""" +
+                        """ the commandline, you have to try and be safe.
  1. Do NOT randomly copy and paste commands from the internet.
  2. Review every command carefully may it be a root command or otherwise (eg: systemctl)
  3. Do not do random typing.
@@ -324,14 +422,27 @@ Rerun might be simple, as is the commandline. But just as in the commandline, yo
               <object class="GtkLabel" id="about">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">&lt;span size="large"&gt;About Rerun&lt;/span&gt;
-Rerun is a tool to run shell commands or applications directly while ignoring output and disallowing input. This allows quickly running applications like gedit or nautilus.
-Rerun has a few tricks up its sleeve: Support for switchable graphics, Run As Root and a tiny fix. It is also very highly optimized for speed. Anything the shell can do, Rerun can do too but just safer and with no output.
-Everything was made from ground-up to be customizable and easy to use and fast. So, enjoy!
+                <property name="tooltip_markup" translatable="yes">&l""" +
+                        """t;span size="large"&gt;About Rerun&lt;/span&gt;
+Rerun is a tool to run shell commands or applications directly while """ +
+                        """ignoring output and disallowing input. Thi""" +
+                        """s allows quickly running applications like""" +
+                        """ gedit or nautilus.
+Rerun has a few tricks up its sleeve: Support for switchable graphics""" +
+                        """, Run As Root and a tiny fix. It is also """ +
+                        """very highly optimized for speed. Anything """ +
+                        """the shell can do, Rerun can do too but just""" +
+                        """ safer and with no output.
+Everything was made from ground-up to be customizable and easy to use""" +
+                        """ and fast. So, enjoy!
 
-Author: Mufeed Ali &lt;span size="x-small"&gt;[nightglare or mufeed20 or mufeed2000][mufeed.ali53@gmail.com]&lt;/span&gt;
+Author: Mufeed Ali &lt;span size="x-small"&gt;[nightglare or mufeed20""" +
+                        """ or mufeed2000][mufeed.ali53@gmail.com]&lt""" +
+                        """;/span&gt;
 License: GNU GPLv3</property>
-                <property name="label" translatable="yes">&lt;b&gt;About Rerun&lt;/b&gt; &lt;span size="x-small"&gt;[hover to read]&lt;/span&gt;</property>
+                <property name="label" translatable="yes">&lt;b&gt;""" +
+                        """About Rerun&lt;/b&gt; &lt;span size="x-small"&""" +
+                        """gt;[hover to read]&lt;/span&gt;</property>
                 <property name="use_markup">True</property>
               </object>
               <packing>
@@ -371,6 +482,8 @@ License: GNU GPLv3</property>
                 <property name="is_focus">True</property>
                 <property name="hexpand">True</property>
                 <property name="activates_default">True</property>
+                <property name="placeholder_text" translatable""" +
+                        """="yes">Type your command here...</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -421,8 +534,9 @@ License: GNU GPLv3</property>
               <object class="GtkLabel" id="maintitle">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">&lt;span size="large"&gt;Rerun&lt;/span&gt;
-&lt;span size="xx-small"&gt;Simple. Thats all.&lt;/span&gt;</property>
+                <property name="label" translatable="yes">&lt""" +
+                        """;span size="large"&gt;Rerun&lt;/span&gt;
+&lt;span size="x-small"&gt;Simple. Thats all.&lt;/span&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="justify">right</property>
                 <property name="track_visited_links">False</property>
@@ -448,30 +562,44 @@ def gload():
 
 
 gload()
+import subprocess  # for processes.
+import threading
 command = builder.get_object('command')
 pron = builder.get_object('pron')
 proff = builder.get_object('proff')
 prdefault = builder.get_object('prdefault')
+rootpass = builder.get_object('rootpass')
+pkexecopt = builder.get_object('pkexecopt')
+sudopt = builder.get_object('sudopt')
+rootpass.set_sensitive(False)
+pkexecopt.set_sensitive(False)
+sudopt.set_sensitive(False)
 
 
 class thready(threading.Thread):
-    def __init__(self, cmd, sin=None, root=False, rpass=None):
+    def __init__(self, cmd, sin=None, root=False, rpass=None, prime=0):
         threading.Thread.__init__(self)
         self.cmd = cmd
         self.root = root
         self.rpass = rpass
         self.sin = sin
+        self.prime = prime
 
     def run(self):
+        denvi = os.environ.copy()
         NULLMAKER = open(os.devnull, 'w')
-        # ^ This is needed for ignoring unwanted terminal output.
-        p = subprocess.Popen(self.cmd, shell=True,
+        if self.prime == 1:
+            denvi["DRI_PRIME"] = "0"
+        elif self.prime == 2:
+            denvi["DRI_PRIME"] = "1"
+        p = subprocess.Popen(self.cmd,
                              stdin=self.sin,
+                             shell=True,
                              stdout=NULLMAKER,
-                             stderr=subprocess.STDOUT,
-                             universal_newlines=True)
+                             stderr=NULLMAKER,
+                             env=denvi)
         if self.root:
-            p.stdin.write(self.rpass + '\n')
+            p.stdin.write(self.rpass.encode() + b'\n')
             p.stdin.close()
 
 
@@ -479,39 +607,56 @@ class rerunmain():
     def on_window_destroy(self, rerun):
         Gtk.main_quit()
 
+    def pktoggle(self, pkexecopt):
+        rootpass.set_sensitive(False)
+
+    def sutoggle(self, sudopt):
+        rootpass.set_sensitive(True)
+
+    def switched(self, rootrun, crap=None):
+        rootrun = builder.get_object('rootrun')
+        if rootrun.get_active():
+            pkexecopt.set_sensitive(True)
+            sudopt.set_sensitive(True)
+        else:
+            pkexecopt.set_sensitive(False)
+            sudopt.set_sensitive(False)
+
     def regrun(self):
         if prdefault.get_active():
             thread = thready(command.get_text())
-            thread.start()
-            thread.join()
         elif pron.get_active():
-            thread = thready("env DRI_PRIME=1 " + command.get_text())
-            thread.start()
-            thread.join()
+            thread = thready(command.get_text(), prime=2)
         elif proff.get_active():
-            thread = thready("env DRI_PRIME=0 " + command.get_text())
-            thread.start()
-            thread.join()
+            thread = thready(command.get_text(), prime=1)
+        thread.start()
+        thread.join()
 
     def sudorun(self):
-        rootpass = builder.get_object('rootpass')
         if prdefault.get_active():
-            thread = thready('sudo -S "' + command.get_text().strip() +
-                             '"', subprocess.PIPE, True, rootpass.get_text())
-            thread.start()
-            thread.join()
+            if rootpass.get_sensitive():
+                thread = thready('sudo -S "' + command.get_text().strip() +
+                                 '"', subprocess.PIPE, True,
+                                 rootpass.get_text())
+            else:
+                thread = thready('pkexec "' + command.get_text().strip() +
+                                 '"')
         elif pron.get_active():
-            thread = thready("env DRI_PRIME=1 " + 'sudo -S "' +
-                             command.get_text().strip() +
-                             '"', subprocess.PIPE, True, rootpass.get_text())
-            thread.start()
-            thread.join()
+            thread = self.primeroot(rootpass, command, 1)
         elif proff.get_active():
-            thread = thready("env DRI_PRIME=0 " + 'sudo -S "' +
-                             command.get_text().strip() +
-                             '"', subprocess.PIPE, True, rootpass.get_text())
-            thread.start()
-            thread.join()
+            thread = self.primeroot(rootpass, command, 0)
+        thread.start()
+        thread.join()
+
+    def primeroot(self, rootpass, command, primeval):
+        if rootpass.get_sensitive():
+            thread = thready('sudo -S "' + command.get_text().strip() +
+                             '"', subprocess.PIPE, True,
+                             rootpass.get_text(), primeval + 1)
+        else:
+            thread = thready('pkexec "' + command.get_text().strip() +
+                             '"', primeval + 1)
+        return thread
 
     def on_run_clicked(self, run):
         rootrun = builder.get_object('rootrun')
@@ -527,7 +672,8 @@ class rerunmain():
 
     def xfixpress(self, xfixbutton):
         try:
-            subprocess.Popen("xhost si:localuser:root", shell=True)
+            subprocess.Popen(["xhost", "si:localuser:root"],
+                             stdout=open(os.devnull, 'w'))
         except Exception as exe:
             print("Running the command failed. Something wrong with")
             print("your PC? This shouldn't be happening. Error:")
@@ -539,19 +685,27 @@ Gtk.main()
 
 # LICENSING:
 #
-# SFRun
-# Copyright (C) 2017 Mufeed Ali [nightglare/mufeed20] <mufeed.ali53@gmail.com>
+# The MIT License (MIT)
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Copyright (c) 2017 Mufeed Ali
+# This file is part of Rerun
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# Author: Mufeed Ali

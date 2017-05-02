@@ -16,11 +16,6 @@ Rerun's master branch is perfectly stable with no reasons to not use it.
 
 ## Explanations and Reasoning
 
-#### Why sudo and not pkexec?
-Well, for one, pkexec does not support Wayland while trying to run graphical applications.  
-For another, pkexec requires every application to have a seperate policy file. Some applications that require root are yet to support this.  
-However, I do plan on supporting pkexec in the next release. But it won't be the default and sudo will stay default until pkexec gets proper Wayland support. It will instead be added as a togglable option just like with Switchable Graphics.
-
 #### Is this an alternative to Alt-F2?
 Yes and No. If you mean simply running commands, then Yes. If you mean, Desktop-specific features (like 'r' & 'lg' in GNOME), No.  
 Also, Rerun has no auto-complete feature as with KDE's Alt-F2 interface.
@@ -29,10 +24,10 @@ Also, Rerun has no auto-complete feature as with KDE's Alt-F2 interface.
 Maybe in the future. But for now, focus is on stabilizing and standardizing the code. I will never implement a full-fledged search interface or anything like that. Maybe something that simply browses /bin and /usr/bin.
 
 #### Do standards matter to you?
-Yes. Absolutely. The python code is PEP8-compliant and non-complex according to McCabe. The XML is valid as expected from Glade.
+Yes. Absolutely. The python code is almost PEP8-compliant (tiny sacrifice made for speed, one rule broken) and non-complex according to McCabe. The XML is valid as expected from Glade.
 
 #### Then, isn't shell=True unsafe?
-No, not in this case. In this case, the command run is from the user anyway and the user could do the same thing from his terminal.
+No, not in this case. In this case, the command run is from the user anyway and the user could do the same thing from his terminal. The security issue of the application would then be the actual use of the application itself. This should in no way hinder the user's actions.
 
 #### Is Rerun an application launcher?
 Not quite. Sure, you could use it to run apps. But Rerun simply runs commands, has no auto-complete, no ability to run applications by their true names, etc.
