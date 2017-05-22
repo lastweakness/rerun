@@ -12,7 +12,7 @@ import os  # basics
 try:
     import gi
     gi.require_version('Gtk', '3.0')  # inform the PC that we need GTK+ 3.
-    from gi.repository import Gtk  # this is the GNOME depends
+    import gi.repository.Gtk as Gtk  # this is the GNOME depends
 except ImportError as imper:
     print("Importing GObject failed!")
     print("Install GObject bindings.")
@@ -32,7 +32,6 @@ def gload():
 gload()
 import subprocess  # for processes.
 import threading
-# ^ Yea. I just violated PEP8 to get a savings of about 300 ms.
 command = builder.get_object('command')
 pron = builder.get_object('pron')
 proff = builder.get_object('proff')
