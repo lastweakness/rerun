@@ -4,7 +4,6 @@
 The MIT License (MIT)
 
 Copyright (c) 2017 Mufeed Ali
-This file is part of Rerun
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +28,7 @@ Author: Mufeed Ali
 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
-  <!-- interface-license-type gplv3 -->
+  <!-- interface-license-type mit -->
   <!-- interface-name Rerun -->
   <!-- interface-description A tool to run GUI applications or simple commands with additional options and better support. -->
   <!-- interface-copyright 2017 Mufeed Ali -->
@@ -362,7 +361,7 @@ Rerun has a few tricks up its sleeve: Support for switchable graphics, Run As Ro
 Everything was made from ground-up to be customizable and easy to use and fast. So, enjoy!
 
 Author: Mufeed Ali &lt;span size="x-small"&gt;[nightglare or mufeed20 or mufeed2000][mufeed.ali53@gmail.com]&lt;/span&gt;
-License: GNU GPLv3</property>
+License: MIT Permissive License</property>
                 <property name="label" translatable="yes">&lt;b&gt;About Rerun&lt;/b&gt; &lt;span size="x-small"&gt;[hover to read]&lt;/span&gt;</property>
                 <property name="use_markup">True</property>
               </object>
