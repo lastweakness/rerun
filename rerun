@@ -12,7 +12,7 @@ import os  # basics
 try:
     import gi
     gi.require_version('Gtk', '3.0')  # inform the PC that we need GTK+ 3.
-    from gi.repository import Gtk  # this is the GNOME depends
+    import gi.repository.Gtk as Gtk  # this is the GNOME depends
 except ImportError as imper:
     print("Importing GObject failed!")
     print("Install GObject bindings.")
@@ -32,7 +32,6 @@ def gload():
 gload()
 import subprocess  # for processes.
 import threading
-# ^ Yea. I just violated PEP8 to get a savings of about 300 ms.
 command = builder.get_object('command')
 pron = builder.get_object('pron')
 proff = builder.get_object('proff')
@@ -45,34 +44,21 @@ pkexecopt.set_sensitive(False)
 sudopt.set_sensitive(False)
 
 
-class thready(threading.Thread):
-    def __init__(self, cmd, sin=None, root=False, rpass=None, prime=0):
-        threading.Thread.__init__(self)
-        self.cmd = cmd
-        self.root = root
-        self.rpass = rpass
-        self.sin = sin
-        self.prime = prime
+class rerunmain():
 
-    def run(self):
+    def execcode(self, cmd, sin=None, root=False, rpass=None, prime=0):
         denvi = os.environ.copy()
-        NULLMAKER = open(os.devnull, 'w')
-        if self.prime == 1:
+        if prime == 1:
             denvi["DRI_PRIME"] = "0"
-        elif self.prime == 2:
+        elif prime == 2:
             denvi["DRI_PRIME"] = "1"
-        p = subprocess.Popen(self.cmd,
-                             stdin=self.sin,
-                             shell=True,
-                             stdout=NULLMAKER,
-                             stderr=NULLMAKER,
-                             env=denvi)
-        if self.root:
-            p.stdin.write(self.rpass.encode() + b'\n')
+        with open(os.devnull, 'w') as NULLMAKER:
+            p = subprocess.Popen(cmd, stdin=sin, shell=True, stdout=NULLMAKER,
+                                 stderr=NULLMAKER, env=denvi)
+        if root:
+            p.stdin.write(rpass.encode() + b'\n')
             p.stdin.close()
 
-
-class rerunmain():
     def on_window_destroy(self, rerun):
         Gtk.main_quit()
 
@@ -93,38 +79,47 @@ class rerunmain():
 
     def regrun(self):
         if prdefault.get_active():
-            thread = thready(command.get_text())
+            threading.Thread(target=self.execcode,
+                             args=(command.get_text(),)).start()
         elif pron.get_active():
-            thread = thready(command.get_text(), prime=2)
+            threading.Thread(target=self.execcode,
+                             args=(command.get_text(),),
+                             kwargs={'prime': 2, }).start()
         elif proff.get_active():
-            thread = thready(command.get_text(), prime=1)
-        thread.start()
-        thread.join()
+            threading.Thread(target=self.execcode,
+                             args=(command.get_text(),),
+                             kwargs={'prime': 1, }).start()
 
     def sudorun(self):
         if prdefault.get_active():
             if rootpass.get_sensitive():
-                thread = thready('sudo -S "' + command.get_text().strip() +
-                                 '"', subprocess.PIPE, True,
-                                 rootpass.get_text())
+                threading.Thread(target=self.execcode,
+                                 args=('sudo -S "' +
+                                       command.get_text().strip() +
+                                       '"', subprocess.PIPE, True,
+                                       rootpass.get_text())).start()
             else:
-                thread = thready('pkexec "' + command.get_text().strip() +
-                                 '"')
+                threading.Thread(target=self.execcode,
+                                 args=('pkexec "' +
+                                       command.get_text().strip() +
+                                       '"')).start()
         elif pron.get_active():
-            thread = self.primeroot(rootpass, command, 1)
+            self.primeroot(rootpass, command, 1).start()
         elif proff.get_active():
-            thread = self.primeroot(rootpass, command, 0)
-        thread.start()
-        thread.join()
+            self.primeroot(rootpass, command, 0).start()
 
     def primeroot(self, rootpass, command, primeval):
         if rootpass.get_sensitive():
-            thread = thready('sudo -S "' + command.get_text().strip() +
-                             '"', subprocess.PIPE, True,
-                             rootpass.get_text(), primeval + 1)
+            thread = threading.Thread(target=self.execcode,
+                                      args=('sudo -S "' +
+                                            command.get_text().strip() +
+                                            '"', subprocess.PIPE, True,
+                                            rootpass.get_text(), primeval + 1))
         else:
-            thread = thready('pkexec "' + command.get_text().strip() +
-                             '"', primeval + 1)
+            thread = threading.Thread(target=self.execcode,
+                                      args=('pkexec "' +
+                                            command.get_text().strip() +
+                                            '"', primeval + 1))
         return thread
 
     def on_run_clicked(self, run):
