@@ -17,7 +17,7 @@ except ImportError as imper:
     print("Importing GObject failed!")
     print("Install GObject bindings.")
     print(imper)
-    sys.exit(0)
+    sys.exit(1)
 
 
 def gload():
