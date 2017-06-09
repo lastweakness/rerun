@@ -42,29 +42,31 @@ import subprocess  # for processes.
 import threading
 
 
+def run(cmd, sin=None, rpass=None, prime=0):
+    denvi = os.environ.copy()
+    if prime == 1:
+        denvi["DRI_PRIME"] = "0"
+    elif prime == 2:
+        denvi["DRI_PRIME"] = "1"
+    with open(os.devnull, 'w') as NULLMAKER:
+        p = subprocess.Popen(cmd, stdin=sin, shell=True, stdout=NULLMAKER,
+                             stderr=NULLMAKER, env=denvi)
+    if sin is not None:
+        p.stdin.write(rpass.encode() + b'\n')
+        p.stdin.close()
+
+
+def threadrun(cmd, sin=None, rpass=None, prime=0):
+    if prime == 0:
+        threading.Thread(target=run,
+                         args=(cmd, sin, rpass)).start()
+    else:
+        threading.Thread(target=run,
+                         args=(cmd, sin, rpass),
+                         kwargs={'prime': prime, }).start()
+
+
 class main():
-
-    def run(self, cmd, sin=None, rpass=None, prime=0):
-        denvi = os.environ.copy()
-        if prime == 1:
-            denvi["DRI_PRIME"] = "0"
-        elif prime == 2:
-            denvi["DRI_PRIME"] = "1"
-        with open(os.devnull, 'w') as NULLMAKER:
-            p = subprocess.Popen(cmd, stdin=sin, shell=True, stdout=NULLMAKER,
-                                 stderr=NULLMAKER, env=denvi)
-        if sin is not None:
-            p.stdin.write(rpass.encode() + b'\n')
-            p.stdin.close()
-
-    def threadrun(self, cmd, sin=None, rpass=None, prime=0):
-        if prime == 0:
-            threading.Thread(target=self.run,
-                             args=(cmd, sin, rpass)).start()
-        else:
-            threading.Thread(target=self.run,
-                             args=(cmd, sin, rpass),
-                             kwargs={'prime': prime, }).start()
 
     def on_window_destroy(self, rerun):
         Gtk.main_quit()
@@ -86,19 +88,19 @@ class main():
 
     def regrun(self):
         if prdefault.get_active():
-            self.threadrun(command.get_text())
+            threadrun(command.get_text())
         elif pron.get_active():
-            self.threadrun(command.get_text(), prime=2)
+            threadrun(command.get_text(), prime=2)
         elif proff.get_active():
-            self.threadrun(command.get_text(), prime=1)
+            threadrun(command.get_text(), prime=1)
 
     def sudorun(self):
         if prdefault.get_active():
             if rootpass.get_sensitive():
-                self.threadrun('sudo -S "' + command.get_text().strip() +
-                               '"', subprocess.PIPE, rootpass.get_text())
+                threadrun('sudo -S "' + command.get_text().strip() + '"',
+                          subprocess.PIPE, rootpass.get_text())
             else:
-                self.threadrun('pkexec "' + command.get_text().strip() + '"')
+                threadrun('pkexec "' + command.get_text().strip() + '"')
         elif pron.get_active():
             self.primeroot(rootpass, command, 1)
         elif proff.get_active():
@@ -106,12 +108,12 @@ class main():
 
     def primeroot(self, rootpass, command, primeval):
         if rootpass.get_sensitive():
-            self.threadrun('sudo -S "' + command.get_text().strip() +
-                           '"', subprocess.PIPE, rootpass.get_text(),
-                           prime=primeval + 1)
+            threadrun('sudo -S "' + command.get_text().strip() + '"',
+                      subprocess.PIPE, rootpass.get_text(),
+                      prime=primeval + 1)
         else:
-            self.threadrun('pkexec "' + command.get_text().strip() + '"',
-                           prime=primeval + 1)
+            threadrun('pkexec "' + command.get_text().strip() + '"',
+                      prime=primeval + 1)
 
     def on_run_clicked(self, run):
         rootrun = builder.get_object('rootrun')
@@ -127,8 +129,9 @@ class main():
 
     def xfixpress(self, xfixbutton):
         try:
-            subprocess.Popen(["xhost", "si:localuser:root"],
-                             stdout=open(os.devnull, 'w'))
+            with open(os.devnull, 'w') as NULLMAKER:
+                subprocess.Popen(["xhost", "si:localuser:root"],
+                                 stdout=NULLMAKER)
         except Exception as exe:
             print("Running the command failed. Something wrong with")
             print("your PC? This shouldn't be happening. Error:")
