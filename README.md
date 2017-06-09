@@ -14,6 +14,16 @@ Rerun is a tool to run shell commands and GUI applications by just typing the co
 
 Rerun's master branch is perfectly stable with no reasons to not use it.
 
+## API
+Rerun comes with a minimal API that provides threaded running as "threadrun" and normal running as "run". Syntax is the same for both:
+```python3
+from rerun import run, threadrun
+
+run(CommanToRun, InputPipe, RootPassword, PRIMEstatus)
+threadrun(CommanToRun, InputPipe, RootPassword, PRIMEstatus)
+```
+The API will be expanded in the near future to support all features of Rerun directly.
+
 ## Explanations and Reasoning
 
 #### Is this an alternative to Alt-F2?
