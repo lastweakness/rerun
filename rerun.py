@@ -6,47 +6,45 @@
 # No bloat whatsoever, no feature creep.
 # Licensing and other notes at the end.
 from __future__ import print_function
-import sys
-import os  # basics
+if __name__ == "__main__":
+    import sys
+    import os
+    try:
+        import gi
+        gi.require_version('Gtk', '3.0')  # inform the PC that we need GTK+ 3.
+        import gi.repository.Gtk as Gtk  # this is the GNOME depends
+    except ImportError as imper:
+        print("Importing GObject failed!")
+        print("Install GObject bindings.")
+        print(imper)
+        sys.exit(1)
 
-try:
-    import gi
-    gi.require_version('Gtk', '3.0')  # inform the PC that we need GTK+ 3.
-    import gi.repository.Gtk as Gtk  # this is the GNOME depends
-except ImportError as imper:
-    print("Importing GObject failed!")
-    print("Install GObject bindings.")
-    print(imper)
-    sys.exit(1)
+    def gload():
+        global builder
+        GLADEFILE = os.path.dirname(os.path.realpath(__file__)) + "/rerun.ui"
+        builder = Gtk.Builder()
+        builder.add_from_file(GLADEFILE)
+        window = builder.get_object('rerun')  # main window
+        window.show_all()
 
-
-def gload():
-    global builder
-    GLADEFILE = os.path.dirname(os.path.realpath(__file__)) + "/rerun.ui"
-    builder = Gtk.Builder()
-    builder.add_from_file(GLADEFILE)
-    window = builder.get_object('rerun')  # main window
-    window.show_all()
-
-
-gload()
+    gload()
+    command = builder.get_object('command')
+    pron = builder.get_object('pron')
+    proff = builder.get_object('proff')
+    prdefault = builder.get_object('prdefault')
+    rootpass = builder.get_object('rootpass')
+    pkexecopt = builder.get_object('pkexecopt')
+    sudopt = builder.get_object('sudopt')
+    rootpass.set_sensitive(False)
+    pkexecopt.set_sensitive(False)
+    sudopt.set_sensitive(False)
 import subprocess  # for processes.
 import threading
-command = builder.get_object('command')
-pron = builder.get_object('pron')
-proff = builder.get_object('proff')
-prdefault = builder.get_object('prdefault')
-rootpass = builder.get_object('rootpass')
-pkexecopt = builder.get_object('pkexecopt')
-sudopt = builder.get_object('sudopt')
-rootpass.set_sensitive(False)
-pkexecopt.set_sensitive(False)
-sudopt.set_sensitive(False)
 
 
-class rerunmain():
+class main():
 
-    def execcode(self, cmd, sin=None, root=False, rpass=None, prime=0):
+    def run(self, cmd, sin=None, rpass=None, prime=0):
         denvi = os.environ.copy()
         if prime == 1:
             denvi["DRI_PRIME"] = "0"
@@ -55,9 +53,18 @@ class rerunmain():
         with open(os.devnull, 'w') as NULLMAKER:
             p = subprocess.Popen(cmd, stdin=sin, shell=True, stdout=NULLMAKER,
                                  stderr=NULLMAKER, env=denvi)
-        if root:
+        if sin is not None:
             p.stdin.write(rpass.encode() + b'\n')
             p.stdin.close()
+
+    def threadrun(self, cmd, sin=None, rpass=None, prime=0):
+        if prime == 0:
+            threading.Thread(target=self.run,
+                             args=(cmd, sin, rpass)).start()
+        else:
+            threading.Thread(target=self.run,
+                             args=(cmd, sin, rpass),
+                             kwargs={'prime': prime, }).start()
 
     def on_window_destroy(self, rerun):
         Gtk.main_quit()
@@ -79,48 +86,32 @@ class rerunmain():
 
     def regrun(self):
         if prdefault.get_active():
-            threading.Thread(target=self.execcode,
-                             args=(command.get_text(),)).start()
+            self.threadrun(command.get_text())
         elif pron.get_active():
-            threading.Thread(target=self.execcode,
-                             args=(command.get_text(),),
-                             kwargs={'prime': 2, }).start()
+            self.threadrun(command.get_text(), prime=2)
         elif proff.get_active():
-            threading.Thread(target=self.execcode,
-                             args=(command.get_text(),),
-                             kwargs={'prime': 1, }).start()
+            self.threadrun(command.get_text(), prime=1)
 
     def sudorun(self):
         if prdefault.get_active():
             if rootpass.get_sensitive():
-                threading.Thread(target=self.execcode,
-                                 args=('sudo -S "' +
-                                       command.get_text().strip() +
-                                       '"', subprocess.PIPE, True,
-                                       rootpass.get_text())).start()
+                self.threadrun('sudo -S "' + command.get_text().strip() +
+                               '"', subprocess.PIPE, rootpass.get_text())
             else:
-                threading.Thread(target=self.execcode,
-                                 args=('pkexec "' +
-                                       command.get_text().strip() +
-                                       '"')).start()
+                self.threadrun('pkexec "' + command.get_text().strip() + '"')
         elif pron.get_active():
-            self.primeroot(rootpass, command, 1).start()
+            self.primeroot(rootpass, command, 1)
         elif proff.get_active():
-            self.primeroot(rootpass, command, 0).start()
+            self.primeroot(rootpass, command, 0)
 
     def primeroot(self, rootpass, command, primeval):
         if rootpass.get_sensitive():
-            thread = threading.Thread(target=self.execcode,
-                                      args=('sudo -S "' +
-                                            command.get_text().strip() +
-                                            '"', subprocess.PIPE, True,
-                                            rootpass.get_text(), primeval + 1))
+            self.threadrun('sudo -S "' + command.get_text().strip() +
+                           '"', subprocess.PIPE, rootpass.get_text(),
+                           prime=primeval + 1)
         else:
-            thread = threading.Thread(target=self.execcode,
-                                      args=('pkexec "' +
-                                            command.get_text().strip() +
-                                            '"', primeval + 1))
-        return thread
+            self.threadrun('pkexec "' + command.get_text().strip() + '"',
+                           prime=primeval + 1)
 
     def on_run_clicked(self, run):
         rootrun = builder.get_object('rootrun')
@@ -144,8 +135,9 @@ class rerunmain():
             print(exe)
 
 
-builder.connect_signals(rerunmain())
-Gtk.main()
+if __name__ == "__main__":
+    builder.connect_signals(main())
+    Gtk.main()
 
 # LICENSING:
 #
