@@ -1,13 +1,13 @@
 # Changelog
-**`IMP`** = Important Note or Announcement corresponding to the release  
+`IMP` = Important Note or Announcement corresponding to the release  
 `FIX` = Bug-fix  
 `NEW` = New feature or a major change  
 `CNG` = Changes  
 `SPD` = Changes corresponding to Performance
 
 ## Current versions following Semantic Versioning
-### 3.0.0 - 2017-06-
-- **`IMP` NEW API**
+### 3.0.0 - 2017-06-10
+- `IMP` New API, Follows Semantic Versioning, adds a changelog
 - `FIX` Fixes signal sent during crash due to not finding GTK+ bindings
 - `NEW` The application structure has been reworked again.
 - `NEW` An API and the ability to import Rerun without rendering the UI
@@ -15,8 +15,7 @@
 ## Before Semantic Versioning
 ### 2.0.1 - 2017-06-04
 - `FIX` Fixes wrong license info in the UI
-- `NEW` The entire application structure has been reworked for better 
-        performance and simpicity
+- `NEW` The entire application structure has been reworked for better performance and simpicity
 - `SPD` Speed of running commands and responsiveness have increased
 
 ### 2.0.0 - 2017-05-03

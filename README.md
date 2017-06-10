@@ -7,22 +7,32 @@ Rerun is a tool to run shell commands and GUI applications by just typing the co
  4. No useless bloat or 'features'. Just whats sometimes necessary.
  5. Easily customizable and fast. Made using Python and Glade.
  6. Free, Open Source and forever-supported.
- 7. Modern with support for Wayland (including running apps as root under wayland)
+ 7. Modern with support for Wayland (including running apps as root under Wayland)
  8. Comes with tips and a fix for possible issue faced.
- 9. Uses multithreading to prevent conflicts and also to prevent freezes.
+ 9. Uses multi-threading to prevent conflicts and also to prevent freezes.
  10. Simple code with less than 200 lines. (master branch)
 
 Rerun's master branch is perfectly stable with no reasons to not use it.
 
 ## API
-Rerun comes with a minimal API that provides threaded running as "threadrun" and normal running as "run". Syntax is the same for both:
-```python3
-from rerun import run, threadrun
+Rerun comes with a minimal API that provides threaded running as `threadrun` and normal running as `run`. Syntax is the same for both:
+```python
+import rerun
 
-run(CommanToRun, InputPipe, RootPassword, PRIMEstatus)
-threadrun(CommanToRun, InputPipe, RootPassword, PRIMEstatus)
+rerun.run("CommanToRun", InputFileOrPipe, "RootPassword", int(PRIMEstatus))
+rerun.threadrun("CommanToRun", InputPipe, "RootPassword", int(PRIMEstatus))
 ```
+`threadrun` is actually a layer over `run` that puts it through the python `threading` module.  
 The API will be expanded in the near future to support all features of Rerun directly.
+
+## TO-DO
+
+ - [ ] Better error-handling.
+ - [ ] Expand API
+ - [ ] Improve Documentation
+ - [x] Define an API
+ - [x] Follow Semantic Versioning
+ - [x] Keep a Changelog
 
 ## Explanations and Reasoning
 

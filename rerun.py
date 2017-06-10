@@ -94,7 +94,7 @@ class main():
         elif proff.get_active():
             threadrun(command.get_text(), prime=1)
 
-    def sudorun(self):
+    def runasroot(self):
         if prdefault.get_active():
             if rootpass.get_sensitive():
                 threadrun('sudo -S "' + command.get_text().strip() + '"',
@@ -122,7 +122,7 @@ class main():
                 if not rootrun.get_active():
                     self.regrun()
                 else:
-                    self.sudorun()
+                    self.runasroot()
         except Exception as exe:
             print('Failed to run command!')
             print(exe)
