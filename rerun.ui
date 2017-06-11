@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.0
+<!-- Generated with glade 3.20.0 
 
 The MIT License (MIT)
 This file is part of Rerun
@@ -72,7 +72,7 @@ Author: Mufeed Ali
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkRadioButton" id="prdefault">
+                  <object class="GtkRadioButton" id="prime_default">
                     <property name="label" translatable="yes">Default</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -87,14 +87,14 @@ Author: Mufeed Ali
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton" id="pron">
+                  <object class="GtkRadioButton" id="prime_on">
                     <property name="label" translatable="yes">Enabled</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
-                    <property name="group">prdefault</property>
+                    <property name="group">prime_default</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -103,14 +103,14 @@ Author: Mufeed Ali
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton" id="proff">
+                  <object class="GtkRadioButton" id="prime_off">
                     <property name="label" translatable="yes">Disabled</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
-                    <property name="group">prdefault</property>
+                    <property name="group">prime_default</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -126,7 +126,7 @@ Author: Mufeed Ali
               </packing>
             </child>
             <child>
-              <object class="GtkImage" id="primewhat">
+              <object class="GtkImage" id="prime_infimg">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">&lt;b&gt;This is ONLY for switchable graphics devices&lt;/b&gt;
@@ -157,7 +157,7 @@ This sets the state of use of Discrete cards on switchable graphics devices. It 
             <property name="can_focus">False</property>
             <property name="spacing">8</property>
             <child>
-              <object class="GtkImage" id="rootsafe">
+              <object class="GtkImage" id="root_infimg">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">Running graphical applications as root is not recommended.
@@ -173,7 +173,7 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="rootlab">
+              <object class="GtkLabel" id="root_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Run As Root</property>
@@ -190,9 +190,10 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkRadioButton" id="pkexecopt">
+                  <object class="GtkRadioButton" id="root_pkexec">
                     <property name="label" translatable="yes">pkexec</property>
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="tooltip_markup" translatable="yes">pkexec is the new &lt;b&gt;standard&lt;/b&gt; way of executing applications as root. This is recommended way to go.</property>
@@ -207,14 +208,15 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton" id="sudopt">
+                  <object class="GtkRadioButton" id="root_sudo">
                     <property name="label" translatable="yes">sudo</property>
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="tooltip_markup" translatable="yes">Running GUI apps with sudo is &lt;b&gt;not&lt;/b&gt; recommended.</property>
                     <property name="draw_indicator">True</property>
-                    <property name="group">pkexecopt</property>
+                    <property name="group">root_pkexec</property>
                     <signal name="clicked" handler="sutoggle" swapped="no"/>
                   </object>
                   <packing>
@@ -231,12 +233,15 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="rootpass">
+              <object class="GtkEntry" id="root_entry">
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="tooltip_markup" translatable="yes">This is &lt;b&gt;NOT&lt;/b&gt; root password. Just the User password.</property>
                 <property name="visibility">False</property>
                 <property name="activates_default">True</property>
                 <property name="placeholder_text" translatable="yes">User Password</property>
+                <property name="input_purpose">password</property>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -245,7 +250,7 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
               </packing>
             </child>
             <child>
-              <object class="GtkSwitch" id="rootrun">
+              <object class="GtkSwitch" id="root_switch">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="margin_top">2</property>
@@ -268,18 +273,18 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
           </packing>
         </child>
         <child>
-          <object class="GtkBox" id="xfix">
+          <object class="GtkBox" id="box_xfix">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="spacing">8</property>
             <child>
-              <object class="GtkButton" id="xfixbutton">
+              <object class="GtkButton" id="xfix">
                 <property name="label" translatable="yes">Fix 'Run As Root' on Wayland</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="relief">half</property>
-                <signal name="clicked" handler="xfixpress" swapped="no"/>
+                <signal name="clicked" handler="XFix" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -288,11 +293,11 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
               </packing>
             </child>
             <child>
-              <object class="GtkImage" id="xfixinfo">
+              <object class="GtkImage" id="xfix_infimg">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">&lt;b&gt;This is usually only needed on Wayland&lt;/b&gt;
-On Wayland, GUI applications may not run as root due to xhost access control. This can be worked around every boot by clicking this button. Better yet, you can make this command run on every boot (this feature will be built-in in an upcoming release). 
+On Wayland, GUI applications may not run as root due to xhost access control. This can be worked around every boot by clicking this button. Better yet, you can make this command run on every boot (this feature will be built-in in an upcoming release).
 This fix (or workaround) tells xhost to allow root to run graphical applications. It is the same as running "xhost si:localuser:root" on every boot.</property>
                 <property name="margin_left">8</property>
                 <property name="margin_top">4</property>
@@ -314,13 +319,13 @@ This fix (or workaround) tells xhost to allow root to run graphical applications
           </packing>
         </child>
         <child>
-          <object class="GtkBox" id="hovers">
+          <object class="GtkBox" id="box_hover">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="hexpand">True</property>
             <property name="spacing">8</property>
             <child>
-              <object class="GtkLabel" id="safety">
+              <object class="GtkLabel" id="safety_info">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">&lt;b&gt;Warnings&lt;/b&gt;
@@ -353,7 +358,7 @@ Rerun might be simple, as is the commandline. But just as in the commandline, yo
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="about">
+              <object class="GtkLabel" id="about_info">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">&lt;span size="large"&gt;About Rerun&lt;/span&gt;
@@ -396,7 +401,7 @@ License: MIT Permissive License</property>
             <property name="hexpand">True</property>
             <property name="spacing">8</property>
             <child>
-              <object class="GtkEntry" id="command">
+              <object class="GtkEntry" id="command_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="has_focus">True</property>

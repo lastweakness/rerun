@@ -6,6 +6,26 @@
 # No bloat whatsoever, no feature creep.
 # Licensing and other notes at the end.
 from __future__ import print_function
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-s", "--safe", action="store_true",
+                    help="Turn on safe mode. This turns off the usage of " +
+                         "shell in Rerun. This has an added security bonus " +
+                         "but restricts usage of Rerun because of the lack " +
+                         "of operators like '&&' or '||'.")
+parsed = parser.parse_args()
+if parsed.safe:
+    SafeMode = True
+else:
+    SafeMode = False
+if not SafeMode:
+    from rerun_core import ThreadRun, pkexecThreadRun, sudoThreadRun
+elif SafeMode:
+    from rerun_core import (safeThreadRun as ThreadRun,
+                            pkexecSafeThreadRun as pkexecThreadRun,
+                            sudoSafeThreadRun as sudoThreadRun)
+    print("Safe Mode is On.")
+
 if __name__ == "__main__":
     import sys
     import os
@@ -19,7 +39,7 @@ if __name__ == "__main__":
         print(imper)
         sys.exit(1)
 
-    def gload():
+    def Load_GUI():
         global builder
         GLADEFILE = os.path.dirname(os.path.realpath(__file__)) + "/rerun.ui"
         builder = Gtk.Builder()
@@ -27,43 +47,12 @@ if __name__ == "__main__":
         window = builder.get_object('rerun')  # main window
         window.show_all()
 
-    gload()
-    command = builder.get_object('command')
-    pron = builder.get_object('pron')
-    proff = builder.get_object('proff')
-    prdefault = builder.get_object('prdefault')
-    rootpass = builder.get_object('rootpass')
-    pkexecopt = builder.get_object('pkexecopt')
-    sudopt = builder.get_object('sudopt')
-    rootpass.set_sensitive(False)
-    pkexecopt.set_sensitive(False)
-    sudopt.set_sensitive(False)
-import subprocess  # for processes.
-import threading
-
-
-def run(cmd, sin=None, rpass=None, prime=0):
-    denvi = os.environ.copy()
-    if prime == 1:
-        denvi["DRI_PRIME"] = "0"
-    elif prime == 2:
-        denvi["DRI_PRIME"] = "1"
-    with open(os.devnull, 'w') as NULLMAKER:
-        p = subprocess.Popen(cmd, stdin=sin, shell=True, stdout=NULLMAKER,
-                             stderr=NULLMAKER, env=denvi)
-    if sin is not None:
-        p.stdin.write(rpass.encode() + b'\n')
-        p.stdin.close()
-
-
-def threadrun(cmd, sin=None, rpass=None, prime=0):
-    if prime == 0:
-        threading.Thread(target=run,
-                         args=(cmd, sin, rpass)).start()
-    else:
-        threading.Thread(target=run,
-                         args=(cmd, sin, rpass),
-                         kwargs={'prime': prime, }).start()
+    Load_GUI()
+    command_entry = builder.get_object('command_entry')
+    prime_on = builder.get_object('prime_on')
+    prime_off = builder.get_object('prime_off')
+    prime_default = builder.get_object('prime_default')
+    root_entry = builder.get_object('root_entry')
 
 
 class main():
@@ -71,67 +60,64 @@ class main():
     def on_window_destroy(self, rerun):
         Gtk.main_quit()
 
-    def pktoggle(self, pkexecopt):
-        rootpass.set_sensitive(False)
+    def pktoggle(self, root_pkexec):
+        root_entry.set_sensitive(False)
 
-    def sutoggle(self, sudopt):
-        rootpass.set_sensitive(True)
+    def sutoggle(self, root_sudo):
+        root_entry.set_sensitive(True)
 
-    def switched(self, rootrun, crap=None):
-        rootrun = builder.get_object('rootrun')
-        if rootrun.get_active():
-            pkexecopt.set_sensitive(True)
-            sudopt.set_sensitive(True)
+    def switched(self, root_switch, crap=None):
+        root_switch = builder.get_object('root_switch')
+        root_pkexec = builder.get_object('root_pkexec')
+        root_sudo = builder.get_object('root_sudo')
+        if root_switch.get_active():
+            root_pkexec.set_sensitive(True)
+            root_sudo.set_sensitive(True)
         else:
-            pkexecopt.set_sensitive(False)
-            sudopt.set_sensitive(False)
+            root_pkexec.set_sensitive(False)
+            root_sudo.set_sensitive(False)
 
-    def regrun(self):
-        if prdefault.get_active():
-            threadrun(command.get_text())
-        elif pron.get_active():
-            threadrun(command.get_text(), prime=2)
-        elif proff.get_active():
-            threadrun(command.get_text(), prime=1)
+    def NormalRun(self, Command):
+        if prime_default.get_active():
+            ThreadRun(Command)
+        elif prime_on.get_active():
+            ThreadRun(Command, PRIME=2)
+        elif prime_off.get_active():
+            ThreadRun(Command, PRIME=1)
 
-    def runasroot(self):
-        if prdefault.get_active():
-            if rootpass.get_sensitive():
-                threadrun('sudo -S "' + command.get_text().strip() + '"',
-                          subprocess.PIPE, rootpass.get_text())
+    def RunAsRoot(self, Command):
+        if prime_default.get_active():
+            if root_entry.get_sensitive():
+                sudoThreadRun(Command, root_entry.get_text())
             else:
-                threadrun('pkexec "' + command.get_text().strip() + '"')
-        elif pron.get_active():
-            self.primeroot(rootpass, command, 1)
-        elif proff.get_active():
-            self.primeroot(rootpass, command, 0)
+                pkexecThreadRun(Command)
+        elif prime_on.get_active():
+            self.PRIMERootRun(Command, 2)
+        elif prime_off.get_active():
+            self.PRIMERootRun(Command, 1)
 
-    def primeroot(self, rootpass, command, primeval):
-        if rootpass.get_sensitive():
-            threadrun('sudo -S "' + command.get_text().strip() + '"',
-                      subprocess.PIPE, rootpass.get_text(),
-                      prime=primeval + 1)
+    def PRIMERootRun(self, Command, PRIME):
+        if root_entry.get_sensitive():
+            sudoThreadRun(Command, root_entry.get_text(), PRIME)
         else:
-            threadrun('pkexec "' + command.get_text().strip() + '"',
-                      prime=primeval + 1)
+            pkexecThreadRun(Command, PRIME)
 
     def on_run_clicked(self, run):
-        rootrun = builder.get_object('rootrun')
+        root_switch = builder.get_object('root_switch')
         try:
-            if not command.get_text().strip() == '':
-                if not rootrun.get_active():
-                    self.regrun()
+            Command = command_entry.get_text().strip()
+            if not Command == '':
+                if not root_switch.get_active():
+                    self.NormalRun(Command)
                 else:
-                    self.runasroot()
+                    self.RunAsRoot(Command)
         except Exception as exe:
             print('Failed to run command!')
             print(exe)
 
-    def xfixpress(self, xfixbutton):
+    def XFix(self, xfix=None):
         try:
-            with open(os.devnull, 'w') as NULLMAKER:
-                subprocess.Popen(["xhost", "si:localuser:root"],
-                                 stdout=NULLMAKER)
+            XHostFix()
         except Exception as exe:
             print("Running the command failed. Something wrong with")
             print("your PC? This shouldn't be happening. Error:")

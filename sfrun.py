@@ -6,34 +6,66 @@
 # No bloat whatsoever, no feature creep.
 # Licensing and other notes at the end.
 from __future__ import print_function
+import argparse
+import os
+import subprocess  # for processes.
+import threading
+import shlex
+parser = argparse.ArgumentParser()
+parser.add_argument("-s", "--safe", action="store_true",
+                    help="Turn on safe mode. This turns off the usage of " +
+                         "shell in Rerun. This has an added security bonus " +
+                         "but restricts usage of Rerun because of the lack " +
+                         "of operators like '&&' or '||'.")
+parsed = parser.parse_args()
+if parsed.safe:
+    SafeMode = True
+    print("Safe Mode is on.")
+else:
+    SafeMode = False
+
+
+def Run(Command, stdin=None, RootPassword=None, PRIME=0):
+    envi = os.environ.copy()
+    if PRIME == 1:
+        envi["DRI_PRIME"] = "0"
+    elif PRIME == 2:
+        envi["DRI_PRIME"] = "1"
+    if SafeMode:
+        Command = shlex.split(Command)
+        ShInvoke = False
+    else:
+        ShInvoke = True
+    with open(os.devnull, 'w') as NULLMAKER:
+        p = subprocess.Popen(Command, stdin=stdin, shell=ShInvoke,
+                             stdout=NULLMAKER, stderr=NULLMAKER,
+                             env=envi)
+    if stdin is not None:
+        p.stdin.write(RootPassword.encode() + b'\n')
+        p.stdin.close()
+
+
+def ThreadRun(Command, stdin=None, RootPassword=None, PRIME=0):
+    if PRIME == 0:
+        threading.Thread(target=Run,
+                         args=(Command, stdin,
+                               RootPassword)).start()
+    elif PRIME == 1 or PRIME == 2:
+        threading.Thread(target=Run,
+                         args=(Command, stdin, RootPassword),
+                         kwargs={'PRIME': PRIME, }).start()
+
+
+def sudoThreadRun(Command, RootPassword=None, PRIME=0):
+    ThreadRun('sudo -S ' + Command, subprocess.PIPE, RootPassword,
+              PRIME)
+
+
+def pkexecThreadRun(Command, PRIME=0):
+    ThreadRun('pkexec ' + Command, PRIME=PRIME)
+
 BUILDERTEXT = """<?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.20.0
-
-The MIT License (MIT)
-This file is part of Rerun
-
-Copyright (c) 2017 Mufeed Ali
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-Author: Mufeed Ali
-
 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
@@ -80,7 +112,7 @@ Author: Mufeed Ali
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkRadioButton" id="prdefault">
+                  <object class="GtkRadioButton" id="prime_default">
                     <property name="label" translatable="yes">Default</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -95,14 +127,14 @@ Author: Mufeed Ali
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton" id="pron">
+                  <object class="GtkRadioButton" id="prime_on">
                     <property name="label" translatable="yes">Enabled</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
-                    <property name="group">prdefault</property>
+                    <property name="group">prime_default</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -111,14 +143,14 @@ Author: Mufeed Ali
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton" id="proff">
+                  <object class="GtkRadioButton" id="prime_off">
                     <property name="label" translatable="yes">Disabled</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
-                    <property name="group">prdefault</property>
+                    <property name="group">prime_default</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -134,7 +166,7 @@ Author: Mufeed Ali
               </packing>
             </child>
             <child>
-              <object class="GtkImage" id="primewhat">
+              <object class="GtkImage" id="prime_infimg">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">&lt;b&gt;This is ONLY for switchable graphics devices&lt;/b&gt;
@@ -165,7 +197,7 @@ This sets the state of use of Discrete cards on switchable graphics devices. It 
             <property name="can_focus">False</property>
             <property name="spacing">8</property>
             <child>
-              <object class="GtkImage" id="rootsafe">
+              <object class="GtkImage" id="root_infimg">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">Running graphical applications as root is not recommended.
@@ -181,7 +213,7 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="rootlab">
+              <object class="GtkLabel" id="root_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Run As Root</property>
@@ -198,9 +230,10 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkRadioButton" id="pkexecopt">
+                  <object class="GtkRadioButton" id="root_pkexec">
                     <property name="label" translatable="yes">pkexec</property>
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="tooltip_markup" translatable="yes">pkexec is the new &lt;b&gt;standard&lt;/b&gt; way of executing applications as root. This is recommended way to go.</property>
@@ -215,14 +248,15 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton" id="sudopt">
+                  <object class="GtkRadioButton" id="root_sudo">
                     <property name="label" translatable="yes">sudo</property>
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="tooltip_markup" translatable="yes">Running GUI apps with sudo is &lt;b&gt;not&lt;/b&gt; recommended.</property>
                     <property name="draw_indicator">True</property>
-                    <property name="group">pkexecopt</property>
+                    <property name="group">root_pkexec</property>
                     <signal name="clicked" handler="sutoggle" swapped="no"/>
                   </object>
                   <packing>
@@ -239,12 +273,15 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="rootpass">
+              <object class="GtkEntry" id="root_entry">
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="tooltip_markup" translatable="yes">This is &lt;b&gt;NOT&lt;/b&gt; root password. Just the User password.</property>
                 <property name="visibility">False</property>
                 <property name="activates_default">True</property>
                 <property name="placeholder_text" translatable="yes">User Password</property>
+                <property name="input_purpose">password</property>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -253,7 +290,7 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
               </packing>
             </child>
             <child>
-              <object class="GtkSwitch" id="rootrun">
+              <object class="GtkSwitch" id="root_switch">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="margin_top">2</property>
@@ -276,18 +313,18 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
           </packing>
         </child>
         <child>
-          <object class="GtkBox" id="xfix">
+          <object class="GtkBox" id="box_xfix">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="spacing">8</property>
             <child>
-              <object class="GtkButton" id="xfixbutton">
+              <object class="GtkButton" id="xfix">
                 <property name="label" translatable="yes">Fix 'Run As Root' on Wayland</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="relief">half</property>
-                <signal name="clicked" handler="xfixpress" swapped="no"/>
+                <signal name="clicked" handler="XFix" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -296,11 +333,11 @@ In Rerun, &lt;b&gt;sudo&lt;/b&gt; is a second option to pkexec as pkexec may not
               </packing>
             </child>
             <child>
-              <object class="GtkImage" id="xfixinfo">
+              <object class="GtkImage" id="xfix_infimg">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">&lt;b&gt;This is usually only needed on Wayland&lt;/b&gt;
-On Wayland, GUI applications may not run as root due to xhost access control. This can be worked around every boot by clicking this button. Better yet, you can make this command run on every boot (this feature will be built-in in an upcoming release). 
+On Wayland, GUI applications may not run as root due to xhost access control. This can be worked around every boot by clicking this button. Better yet, you can make this command run on every boot (this feature will be built-in in an upcoming release).
 This fix (or workaround) tells xhost to allow root to run graphical applications. It is the same as running "xhost si:localuser:root" on every boot.</property>
                 <property name="margin_left">8</property>
                 <property name="margin_top">4</property>
@@ -322,13 +359,13 @@ This fix (or workaround) tells xhost to allow root to run graphical applications
           </packing>
         </child>
         <child>
-          <object class="GtkBox" id="hovers">
+          <object class="GtkBox" id="box_hover">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="hexpand">True</property>
             <property name="spacing">8</property>
             <child>
-              <object class="GtkLabel" id="safety">
+              <object class="GtkLabel" id="safety_info">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">&lt;b&gt;Warnings&lt;/b&gt;
@@ -361,7 +398,7 @@ Rerun might be simple, as is the commandline. But just as in the commandline, yo
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="about">
+              <object class="GtkLabel" id="about_info">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_markup" translatable="yes">&lt;span size="large"&gt;About Rerun&lt;/span&gt;
@@ -404,7 +441,7 @@ License: MIT Permissive License</property>
             <property name="hexpand">True</property>
             <property name="spacing">8</property>
             <child>
-              <object class="GtkEntry" id="command">
+              <object class="GtkEntry" id="command_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="has_focus">True</property>
@@ -480,6 +517,7 @@ License: MIT Permissive License</property>
     </child>
   </object>
 </interface>"""
+
 if __name__ == "__main__":
     import sys
     import os
@@ -493,115 +531,85 @@ if __name__ == "__main__":
         print(imper)
         sys.exit(1)
 
-    def gload():
+    def Load_GUI():
         global builder
+        GLADEFILE = os.path.dirname(os.path.realpath(__file__)) + "/rerun.ui"
         builder = Gtk.Builder()
-        builder.add_from_string(BUILDERTEXT)
+        builder.add_from_file(GLADEFILE)
         window = builder.get_object('rerun')  # main window
         window.show_all()
 
-    gload()
-    command = builder.get_object('command')
-    pron = builder.get_object('pron')
-    proff = builder.get_object('proff')
-    prdefault = builder.get_object('prdefault')
-    rootpass = builder.get_object('rootpass')
-    pkexecopt = builder.get_object('pkexecopt')
-    sudopt = builder.get_object('sudopt')
-    rootpass.set_sensitive(False)
-    pkexecopt.set_sensitive(False)
-    sudopt.set_sensitive(False)
-import subprocess  # for processes.
-import threading
+    Load_GUI()
+    command_entry = builder.get_object('command_entry')
+    prime_on = builder.get_object('prime_on')
+    prime_off = builder.get_object('prime_off')
+    prime_default = builder.get_object('prime_default')
+    root_entry = builder.get_object('root_entry')
 
 
 class main():
 
-    def run(self, cmd, sin=None, rpass=None, prime=0):
-        denvi = os.environ.copy()
-        if prime == 1:
-            denvi["DRI_PRIME"] = "0"
-        elif prime == 2:
-            denvi["DRI_PRIME"] = "1"
-        with open(os.devnull, 'w') as NULLMAKER:
-            p = subprocess.Popen(cmd, stdin=sin, shell=True, stdout=NULLMAKER,
-                                 stderr=NULLMAKER, env=denvi)
-        if sin is not None:
-            p.stdin.write(rpass.encode() + b'\n')
-            p.stdin.close()
-
-    def threadrun(self, cmd, sin=None, rpass=None, prime=0):
-        if prime == 0:
-            threading.Thread(target=self.run,
-                             args=(cmd, sin, rpass)).start()
-        else:
-            threading.Thread(target=self.run,
-                             args=(cmd, sin, rpass),
-                             kwargs={'prime': prime, }).start()
-
     def on_window_destroy(self, rerun):
         Gtk.main_quit()
 
-    def pktoggle(self, pkexecopt):
-        rootpass.set_sensitive(False)
+    def pktoggle(self, root_pkexec):
+        root_entry.set_sensitive(False)
 
-    def sutoggle(self, sudopt):
-        rootpass.set_sensitive(True)
+    def sutoggle(self, root_sudo):
+        root_entry.set_sensitive(True)
 
-    def switched(self, rootrun, crap=None):
-        rootrun = builder.get_object('rootrun')
-        if rootrun.get_active():
-            pkexecopt.set_sensitive(True)
-            sudopt.set_sensitive(True)
+    def switched(self, root_switch, crap=None):
+        root_switch = builder.get_object('root_switch')
+        root_pkexec = builder.get_object('root_pkexec')
+        root_sudo = builder.get_object('root_sudo')
+        if root_switch.get_active():
+            root_pkexec.set_sensitive(True)
+            root_sudo.set_sensitive(True)
         else:
-            pkexecopt.set_sensitive(False)
-            sudopt.set_sensitive(False)
+            root_pkexec.set_sensitive(False)
+            root_sudo.set_sensitive(False)
 
-    def regrun(self):
-        if prdefault.get_active():
-            self.threadrun(command.get_text())
-        elif pron.get_active():
-            self.threadrun(command.get_text(), prime=2)
-        elif proff.get_active():
-            self.threadrun(command.get_text(), prime=1)
+    def NormalRun(self, Command):
+        if prime_default.get_active():
+            ThreadRun(Command)
+        elif prime_on.get_active():
+            ThreadRun(Command, PRIME=2)
+        elif prime_off.get_active():
+            ThreadRun(Command, PRIME=1)
 
-    def sudorun(self):
-        if prdefault.get_active():
-            if rootpass.get_sensitive():
-                self.threadrun('sudo -S "' + command.get_text().strip() +
-                               '"', subprocess.PIPE, rootpass.get_text())
+    def RunAsRoot(self, Command):
+        if prime_default.get_active():
+            if root_entry.get_sensitive():
+                sudoThreadRun(Command, root_entry.get_text())
             else:
-                self.threadrun('pkexec "' + command.get_text().strip() + '"')
-        elif pron.get_active():
-            self.primeroot(rootpass, command, 1)
-        elif proff.get_active():
-            self.primeroot(rootpass, command, 0)
+                pkexecThreadRun(Command)
+        elif prime_on.get_active():
+            self.PRIMERootRun(Command, 2)
+        elif prime_off.get_active():
+            self.PRIMERootRun(Command, 1)
 
-    def primeroot(self, rootpass, command, primeval):
-        if rootpass.get_sensitive():
-            self.threadrun('sudo -S "' + command.get_text().strip() +
-                           '"', subprocess.PIPE, rootpass.get_text(),
-                           prime=primeval + 1)
+    def PRIMERootRun(self, Command, PRIME):
+        if root_entry.get_sensitive():
+            sudoThreadRun(Command, root_entry.get_text(), PRIME)
         else:
-            self.threadrun('pkexec "' + command.get_text().strip() + '"',
-                           prime=primeval + 1)
+            pkexecThreadRun(Command, PRIME)
 
     def on_run_clicked(self, run):
-        rootrun = builder.get_object('rootrun')
+        root_switch = builder.get_object('root_switch')
         try:
-            if not command.get_text().strip() == '':
-                if not rootrun.get_active():
-                    self.regrun()
+            Command = command_entry.get_text().strip()
+            if not Command == '':
+                if not root_switch.get_active():
+                    self.NormalRun(Command)
                 else:
-                    self.sudorun()
+                    self.RunAsRoot(Command)
         except Exception as exe:
             print('Failed to run command!')
             print(exe)
 
-    def xfixpress(self, xfixbutton):
+    def XFix(self, xfix=None):
         try:
-            subprocess.Popen(["xhost", "si:localuser:root"],
-                             stdout=open(os.devnull, 'w'))
+            XHostFix()
         except Exception as exe:
             print("Running the command failed. Something wrong with")
             print("your PC? This shouldn't be happening. Error:")
