@@ -18,11 +18,6 @@ parser.add_argument("-s", "--safe", action="store_true",
                          "but restricts usage of Rerun because of the lack " +
                          "of operators like '&&' or '||'.")
 parsed = parser.parse_args()
-if parsed.safe:
-    SafeMode = True
-    print("Safe Mode is on.")
-else:
-    SafeMode = False
 
 
 def Run(Command, stdin=None, RootPassword=None, PRIME=0):
@@ -31,9 +26,10 @@ def Run(Command, stdin=None, RootPassword=None, PRIME=0):
         envi["DRI_PRIME"] = "0"
     elif PRIME == 2:
         envi["DRI_PRIME"] = "1"
-    if SafeMode:
+    if parsed.safe:
         Command = shlex.split(Command)
         ShInvoke = False
+        print("Safe Mode is on.")
     else:
         ShInvoke = True
     with open(os.devnull, 'w') as NULLMAKER:
