@@ -66,6 +66,32 @@ rerun_core.pkexecSafeThreadRun("CommanToRun", int(PRIMEstatus))
 rerun_core.XHostFix()
 ```
 
+## Switching to Safe Mode permanently
+This is only available as a manual tweak, but since it is easy and harmless, I'm putting this here. This part of the code:
+```python
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-s", "--safe", action="store_true",
+                    help="Turn on safe mode. This turns off the usage of " +
+                         "shell in Rerun. This has an added security bonus " +
+                         "but restricts usage of Rerun because of the lack " +
+                         "of operators like '&&' or '||'.")
+parsed = parser.parse_args()
+if parsed.safe:
+    from rerun_core import (safeThreadRun as ThreadRun,
+                            pkexecSafeThreadRun as pkexecThreadRun,
+                            sudoSafeThreadRun as sudoThreadRun)
+    print("Safe Mode is On.")
+else:
+    from rerun_core import ThreadRun, pkexecThreadRun, sudoThreadRun
+```
+can be replaced with just this:
+```python
+from rerun_core import (safeThreadRun as ThreadRun,
+                        pkexecSafeThreadRun as pkexecThreadRun,
+                        sudoSafeThreadRun as sudoThreadRun)
+```
+
 ## TO-DO
 
  - [ ] Better error-handling. `Ongoing`

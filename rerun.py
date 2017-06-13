@@ -15,16 +15,12 @@ parser.add_argument("-s", "--safe", action="store_true",
                          "of operators like '&&' or '||'.")
 parsed = parser.parse_args()
 if parsed.safe:
-    SafeMode = True
-else:
-    SafeMode = False
-if not SafeMode:
-    from rerun_core import ThreadRun, pkexecThreadRun, sudoThreadRun
-elif SafeMode:
     from rerun_core import (safeThreadRun as ThreadRun,
                             pkexecSafeThreadRun as pkexecThreadRun,
                             sudoSafeThreadRun as sudoThreadRun)
     print("Safe Mode is On.")
+else:
+    from rerun_core import ThreadRun, pkexecThreadRun, sudoThreadRun
 
 if __name__ == "__main__":
     import sys
