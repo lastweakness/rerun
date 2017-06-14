@@ -7,7 +7,7 @@
 `SPD` = Changes effecting Performance
 
 ## Current versions following Semantic Versioning
-### 4.0.0 - 2017-06-11
+### 4.0.0 - 2017-06-14
 - `IMP` The module (or API) has changed a lot and has been expanded. The module
 has been split-off into `rerun_core.py` which rerun also imports.
 - `NEW` Added a Safe Mode where the shell is not invoked. This allows the user
