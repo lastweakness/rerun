@@ -12,6 +12,8 @@ import shlex
 
 
 def Run(Command, stdin=None, RootPassword=None, PRIME=0):
+    """Run a command. This does not use threading and may hang up the
+     main thread and thus, the application"""
     envi = os.environ.copy()
     if PRIME == 1:
         envi["DRI_PRIME"] = "0"
@@ -27,6 +29,7 @@ def Run(Command, stdin=None, RootPassword=None, PRIME=0):
 
 
 def safeRun(Command, stdin=None, RootPassword=None, PRIME=0):
+    """A safer variant of Run() that is invulnerable to shell injection"""
     envi = os.environ.copy()
     if PRIME == 1:
         envi["DRI_PRIME"] = "0"
@@ -42,6 +45,8 @@ def safeRun(Command, stdin=None, RootPassword=None, PRIME=0):
 
 
 def ThreadRun(Command, stdin=None, RootPassword=None, PRIME=0):
+    """Run a command without locking up the main thread by using 
+    multithreading"""
     if PRIME == 0:
         threading.Thread(target=Run,
                          args=(Command, stdin,
@@ -53,6 +58,8 @@ def ThreadRun(Command, stdin=None, RootPassword=None, PRIME=0):
 
 
 def safeThreadRun(Command, stdin=None, RootPassword=None, PRIME=0):
+    """A safer variant of ThreadRun() that is invulnerable to shell 
+    injection"""
     if PRIME == 0:
         threading.Thread(target=safeRun,
                          args=(Command, stdin,
@@ -64,42 +71,55 @@ def safeThreadRun(Command, stdin=None, RootPassword=None, PRIME=0):
 
 
 def sudoThreadRun(Command, RootPassword=None, PRIME=0):
+    """A variant of ThreadRun() that runs the application as root
+     using sudo."""
     ThreadRun('sudo -S ' + Command, subprocess.PIPE, RootPassword,
               PRIME)
 
 
 def sudoSafeThreadRun(Command, RootPassword=None, PRIME=0):
+    """A safer variant of sudoThreadRun() that is invulnerable to 
+    shell injection."""
     safeThreadRun('sudo -S ' + Command, subprocess.PIPE, RootPassword,
                   PRIME)
 
 
 def sudoRun(Command, RootPassword=None, PRIME=0):
+    """A variant of Run() that runs the application as root using sudo."""
     Run('sudo -S ' + Command, subprocess.PIPE,
         RootPassword, PRIME)
 
 
 def sudoSafeRun(Command, RootPassword=None, PRIME=0):
+    """A safer variant of sudoRun() that is invulnerable to shell issues."""
     safeRun('sudo -S ' + Command, subprocess.PIPE,
             RootPassword, PRIME)
 
 
 def pkexecThreadRun(Command, PRIME=0):
+    """A variant of ThreadRun() that runs the application as root
+     using pkexec."""
     ThreadRun('pkexec ' + Command, PRIME=PRIME)
 
 
 def pkexecSafeThreadRun(Command, PRIME=0):
+    """A safer variant of pkexecThreadRun() that is invulnerable to
+     shell injection."""
     safeThreadRun('pkexec ' + Command, PRIME=PRIME)
 
 
 def pkexecRun(Command, PRIME=0):
+    """A variant of Run() that runs the application as root using pkexec."""
     Run('pkexec ' + Command, PRIME=PRIME)
 
 
 def pkexecSafeRun(Command, PRIME=0):
+    """A safer variant of pkexecRun() that is invulnerable to shell issues."""
     safeRun('pkexec ' + Command, PRIME=PRIME)
 
 
 def XHostFix():
+    """Fixes possible launch issues on Wayland"""
     with open(os.devnull, 'w') as NULLMAKER:
         subprocess.Popen(["xhost", "si:localuser:root"],
                          stdout=NULLMAKER)
