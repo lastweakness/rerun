@@ -7,24 +7,21 @@
 # Licensing and other notes at the end.
 from __future__ import print_function
 import argparse
+from rerun_core import XHostFix
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", "--safe", action="store_true",
                     help="Turn on safe mode. This turns off the usage of " +
-                         "shell in Rerun. This has an added security bonus " +
-                         "but restricts usage of Rerun because of the lack " +
-                         "of operators like '&&' or '||'.")
+                    "shell in Rerun. This has an added security bonus " +
+                    "but restricts usage of Rerun because of the lack " +
+                    "of operators like '&&' or '||'.")
 parsed = parser.parse_args()
 if parsed.safe:
-    SafeMode = True
-else:
-    SafeMode = False
-if not SafeMode:
-    from rerun_core import ThreadRun, pkexecThreadRun, sudoThreadRun
-elif SafeMode:
     from rerun_core import (safeThreadRun as ThreadRun,
                             pkexecSafeThreadRun as pkexecThreadRun,
                             sudoSafeThreadRun as sudoThreadRun)
     print("Safe Mode is On.")
+else:
+    from rerun_core import ThreadRun, pkexecThreadRun, sudoThreadRun
 
 if __name__ == "__main__":
     import sys
@@ -58,26 +55,36 @@ if __name__ == "__main__":
 class main():
 
     def on_window_destroy(self, rerun):
+        """Clean up and close"""
         Gtk.main_quit()
 
     def pktoggle(self, root_pkexec):
+        """Choose pkexec over sudo"""
         root_entry.set_sensitive(False)
 
     def sutoggle(self, root_sudo):
+        """Choose sudo over pkexec"""
         root_entry.set_sensitive(True)
 
     def switched(self, root_switch, crap=None):
+        """Set widget states based on if root is enabled"""
         root_switch = builder.get_object('root_switch')
         root_pkexec = builder.get_object('root_pkexec')
         root_sudo = builder.get_object('root_sudo')
         if root_switch.get_active():
             root_pkexec.set_sensitive(True)
             root_sudo.set_sensitive(True)
+            if root_sudo.get_active():
+                root_entry.set_sensitive(True)
+            else:
+                root_entry.set_sensitive(False)
         else:
             root_pkexec.set_sensitive(False)
             root_sudo.set_sensitive(False)
+            root_entry.set_sensitive(False)
 
     def NormalRun(self, Command):
+        """Running normally, without root, but may or may not use PRIME"""
         if prime_default.get_active():
             ThreadRun(Command)
         elif prime_on.get_active():
@@ -86,6 +93,7 @@ class main():
             ThreadRun(Command, PRIME=1)
 
     def RunAsRoot(self, Command):
+        """Running as root"""
         if prime_default.get_active():
             if root_entry.get_sensitive():
                 sudoThreadRun(Command, root_entry.get_text())
@@ -97,12 +105,14 @@ class main():
             self.PRIMERootRun(Command, 1)
 
     def PRIMERootRun(self, Command, PRIME):
+        """Running as root but with PRIME"""
         if root_entry.get_sensitive():
             sudoThreadRun(Command, root_entry.get_text(), PRIME)
         else:
             pkexecThreadRun(Command, PRIME)
 
     def on_run_clicked(self, run):
+        """Click the run button"""
         root_switch = builder.get_object('root_switch')
         try:
             Command = command_entry.get_text().strip()
@@ -115,7 +125,8 @@ class main():
             print('Failed to run command!')
             print(exe)
 
-    def XFix(self, xfix=None):
+    def XFix(self, xfix):
+        """Fixes possible launch issues on Wayland"""
         try:
             XHostFix()
         except Exception as exe:
