@@ -437,6 +437,7 @@ License: MIT Permissive License</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
                 <signal name="clicked" handler="on_run_clicked" swapped="no"/>
+                <accelerator key="Return" signal="clicked"/>
               </object>
               <packing>
                 <property name="expand">False</property>

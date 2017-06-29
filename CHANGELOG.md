@@ -7,12 +7,15 @@
 `SPD` = Changes effecting Performance
 
 ## Current versions following Semantic Versioning
-### 4.0.0 - 2017-06-14
+### 4.0.0 - 2017-06-29
 - `IMP` The module (or API) has changed a lot and has been expanded. The module
 has been split-off into `rerun_core.py` which rerun also imports.
 - `NEW` Added a Safe Mode where the shell is not invoked. This allows the user
 to not have to worry about possible security issues with the shell.
 - `NEW` Ability to parse command-line input. For now, just `-s` or `--safe`.
+- `NEW` Clicking 'Return' key anywhere on the UI should run the command now.
+(Added Hotkey)
+- `NEW` Way better in-code documentation with `docstrings` and more.
 - `CNG` SFRun structure changed, but still single-file.
 - `CNG` A lot of functions' and objects' names have changed for the sake of
 Human readability.

@@ -473,6 +473,7 @@ License: MIT Permissive License</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
                 <signal name="clicked" handler="on_run_clicked" swapped="no"/>
+                <accelerator key="Return" signal="clicked"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -605,7 +606,9 @@ class main():
 
     def XFix(self, xfix=None):
         try:
-            XHostFix()
+            with open(os.devnull, 'w') as NULLMAKER:
+                subprocess.Popen(["xhost", "si:localuser:root"],
+                                 stdout=NULLMAKER)
         except Exception as exe:
             print("Running the command failed. Something wrong with")
             print("your PC? This shouldn't be happening. Error:")
