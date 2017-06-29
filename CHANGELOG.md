@@ -13,13 +13,11 @@ has been split-off into `rerun_core.py` which rerun also imports.
 - `NEW` Added a Safe Mode where the shell is not invoked. This allows the user
 to not have to worry about possible security issues with the shell.
 - `NEW` Ability to parse command-line input. For now, just `-s` or `--safe`.
-- `NEW` Clicking 'Return' key anywhere on the UI should run the command now.
-(Added Hotkey)
-- `NEW` Way better in-code documentation with `docstrings` and more.
+- `NEW` Added 'Return' key as hotkey so that it works anywhere on the UI.
 - `CNG` SFRun structure changed, but still single-file.
 - `CNG` A lot of functions' and objects' names have changed for the sake of
 Human readability.
-- `CNG` Improved documentation
+- `CNG` Way better in-code documentation with `docstrings` and more.
 - `MOD` Functions have been renamed, refer to README.
 - `MOD` New functions have been added, refer to README.
 

@@ -16,11 +16,14 @@ Rerun is a tool to run shell commands and GUI applications by just typing the co
 
 Rerun's master branch is perfectly stable with no reasons to not use it.
 
-## Python Module or API
-Rerun comes with a minimal python module called `rerun_core.py` that provides
+## Python Module
+Rerun comes with a python module called `rerun_core.py` that provides
 threaded running as `ThreadRun` and normal running as `Run`.  There are also
 their root variants and an additional `XHostFix` for fixing an issue on Wayland.
  Syntax is very similar for all except `XHostFix` which requires no arguments.
+
+The module is easy to use and well-documented with docstrings and this README
+should help.
 
 Most of the module is simply layering one function over the other.
 
@@ -29,26 +32,14 @@ Most of the module is simply layering one function over the other.
 import rerun_core
 
 # Regular ones first
-rerun_core.Run(
-        "CommanToRun",
-        InputFileOrPipe,
-        "RootPassword",
-        int(PRIMEstatus)
-        )
+rerun_core.Run("CommanToRun", InputFileOrPipe, "RootPassword", int(PRIMEstatus))
 rerun_core.ThreadRun("CommanToRun", InputFileOrPipe, "RootPassword",
                      int(PRIMEstatus))
 
-rerun_core.sudoRun(
-        "CommanToRun",
-        "RootPassword",
-        int(PRIMEstatus)
-        )
+rerun_core.sudoRun("CommanToRun", "RootPassword", int(PRIMEstatus))
 rerun_core.sudoThreadRun("CommanToRun", "RootPassword", int(PRIMEstatus))
 
-rerun_core.pkexecRun(
-        "CommanToRun",
-        int(PRIMEstatus)
-        )
+rerun_core.pkexecRun("CommanToRun", int(PRIMEstatus))
 rerun_core.pkexecThreadRun("CommanToRun", int(PRIMEstatus))
 
 # Safer alternatives with other caveats
@@ -70,12 +61,13 @@ rerun_core.XHostFix()
 This is only available as a manual tweak, but since it is easy and harmless, I'm putting this here. This part of the code:
 ```python
 import argparse
+from rerun_core import XHostFix
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", "--safe", action="store_true",
                     help="Turn on safe mode. This turns off the usage of " +
-                         "shell in Rerun. This has an added security bonus " +
-                         "but restricts usage of Rerun because of the lack " +
-                         "of operators like '&&' or '||'.")
+                    "shell in Rerun. This has an added security bonus " +
+                    "but restricts usage of Rerun because of the lack " +
+                    "of operators like '&&' or '||'.")
 parsed = parser.parse_args()
 if parsed.safe:
     from rerun_core import (safeThreadRun as ThreadRun,
@@ -89,17 +81,19 @@ can be replaced with just this:
 ```python
 from rerun_core import (safeThreadRun as ThreadRun,
                         pkexecSafeThreadRun as pkexecThreadRun,
-                        sudoSafeThreadRun as sudoThreadRun)
+                        sudoSafeThreadRun as sudoThreadRun,
+                        XHostFix)
 ```
 
 ## TO-DO
 
- - [ ] Better error-handling. `Ongoing`
- - [ ] Improve Documentation `Ongoing`
- - [x] Expand the module or API
- - [x] Define a module or an API
- - [x] Follow Semantic Versioning
  - [x] Keep a Changelog
+ - [x] Follow Semantic Versioning
+ - [x] Make a reusable module
+ - [x] Expand the module
+ - [x] Improve Documentation
+ - [ ] Better error-handling. `Ongoing`
+ - [ ] Improve performance. `Forever ongoing`
 
 ## Explanations and Reasoning
 
