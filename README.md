@@ -6,4 +6,4 @@ Rerun is a tool to run shell commands and GUI applications by just typing the co
 
 Seriously, that's it. And I'm not even sure if that's useful now.
 
-### Obviously abandoned. o_o
+### Obviously abandoned. o_o And I don't know why I even bothered making it in the first place, not like it was much work.
